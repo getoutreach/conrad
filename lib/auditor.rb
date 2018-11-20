@@ -1,4 +1,4 @@
-require "auditor/version"
+require 'auditor/version'
 
 module Auditor
   class Error < StandardError; end
