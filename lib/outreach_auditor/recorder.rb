@@ -10,10 +10,12 @@ module OutreachAuditor
   #
   # @!attribute [r] formatter
   #    Configured formatter for creating the final event. Defaults to
-  #    JSONFormatter. @see OutreachAuditor::JSONFormatter
+  #    JSONFormatter.
+  #    @see OutreachAuditor::JSONFormatter
   # @!attribute [r] emitter
   #    Configured emitter for sending the final event. Defaults to
-  #    StdoutEmitter. @see OutreachAuditor::StdoutEmitter
+  #    StdoutEmitter.
+  #    @see OutreachAuditor::StdoutEmitter
   class Recorder
     # Allowed types for values given as audit event attributes
     SCALAR_TYPES = [String, Symbol, Integer, NilClass, FalseClass, TrueClass, Float].freeze
