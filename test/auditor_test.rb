@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class AuditorTest < Minitest::Test
+class OutreachAuditorTest < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil ::Auditor::VERSION
+    refute_nil ::OutreachAuditor::VERSION
   end
 
   def test_it_does_something_useful
