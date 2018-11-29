@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 
 module OutreachAuditor
@@ -5,9 +7,11 @@ module OutreachAuditor
   class JSONFormatter
     # Formats a given Hash into a presentable JSON format.
     #
-    # @return [String]
-    def call(_event)
-      recordable_event.to_json
+    # @param event [Hash] event to be formatted
+    #
+    # @return [String] JSON formatted string
+    def call(event)
+      event.to_json
     end
   end
 end

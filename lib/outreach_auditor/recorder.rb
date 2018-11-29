@@ -1,6 +1,6 @@
-require_relative '../errors'
-require_relative '../stdout_emitter'
-require_relative '../json_formatter'
+require 'outreach_auditor/errors'
+require 'outreach_auditor/stdout_emitter'
+require 'outreach_auditor/json_formatter'
 
 module OutreachAuditor
   # Provides the ability to record an event took place.
@@ -16,13 +16,27 @@ module OutreachAuditor
   #    Configured emitter for sending the final event. Defaults to
   #    StdoutEmitter.
   #    @see OutreachAuditor::StdoutEmitter
+  # @!attribute [r] middlewares
+  #    Configured middlewares for processing the event pre-formatting and
+  #    emission. Defaults to an empty array.
   class Recorder
     # Allowed types for values given as audit event attributes
     SCALAR_TYPES = [String, Symbol, Integer, NilClass, FalseClass, TrueClass, Float].freeze
 
     attr_reader :formatter, :emitter, :middlewares
 
+    # All arguments passed must *explicitly* respond to a `call` method.
+    #
+    # @param formatter [#call] formatter for creating the final event
+    # @param emitter [#call] emitter for sending the final event
+    # @param middlewares [Array<#call>] middlewares for processing the event
+    #   pre-formatting and emission
+    #
+    # @raise [ArgumentError] if the formatter, emitter, or any of the
+    #   middlewares do not respond_to? `call` with a truthy value.
     def initialize(formatter: JSONFormatter.new, emitter: StdoutEmitter.new, middlewares: [])
+      check_callability(formatter: formatter, emitter: emitter, middlewares: middlewares)
+
       @formatter = formatter
       @emitter = emitter
       @middlewares = middlewares
@@ -52,6 +66,12 @@ module OutreachAuditor
     end
 
     private
+
+    def check_callability(formatter:, emitter:, middlewares:)
+      [formatter, emitter, *middlewares].each do |callable|
+        raise ArgumentError, "#{callable} does not respond to `#call`" unless callable.respond_to?(:call)
+      end
+    end
 
     def validate_event_keys_and_values(event)
       event.each do |key, value|

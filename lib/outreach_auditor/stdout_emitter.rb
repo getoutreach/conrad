@@ -1,9 +1,9 @@
 module OutreachAuditor
-  # Basic emitter for sending events to STDOUT.
+  # Basic emitter for sending events to $stdout.
   class StdoutEmitter
-    # Puts an event to STDOUT. More or less an alias for `STDOUT.puts`
+    # Puts an event to $stdout.
     def call(event)
-      STDOUT.puts event
+      puts event
     end
   end
 end

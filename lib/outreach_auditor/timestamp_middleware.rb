@@ -1,4 +1,4 @@
-require_relative '../errors'
+require 'outreach_auditor/errors'
 
 module OutreachAuditor
   # Used to add timestamps to an audit event in seconds or milliseconds.

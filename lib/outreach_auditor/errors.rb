@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module OutreachAuditor
   # Base error class
   class Error < StandardError
