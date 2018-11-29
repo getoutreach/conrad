@@ -1,0 +1,28 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: ruby
+    tag: 2.5-slim
+
+inputs:
+  - name: source
+  - name: metadata
+
+outputs:
+  - name: test
+
+params:
+  PR:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e -x
+
+    cd test
+    bex rubocop --fail-level autocorrect
+    bex rake test
