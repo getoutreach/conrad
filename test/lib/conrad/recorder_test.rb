@@ -89,18 +89,6 @@ class RecorderTest < Minitest::Test
     assert_output("#{formatter.call(event)}\n") { recorder.audit_event(event) }
   end
 
-  def test_raises_forbidden_value_when_given_a_hash_value
-    assert_raises(Conrad::ForbiddenValue) do
-      Conrad::Recorder.new.audit_event(bad_value: {})
-    end
-  end
-
-  def test_raises_forbidden_value_when_given_an_arbitrary_object
-    assert_raises(Conrad::ForbiddenValue) do
-      Conrad::Recorder.new.audit_event(bad_value: Conrad::Recorder.new)
-    end
-  end
-
   def test_raises_forbidden_key_when_given_non_string_or_symbol_attribute
     assert_raises(Conrad::ForbiddenKey) do
       Conrad::Recorder.new.audit_event(1 => '')

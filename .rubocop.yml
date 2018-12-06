@@ -4,3 +4,7 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Exclude:
     - 'test/**/*'
+
+Style/Documentation:
+  Exclude:
+    - 'test/**/*'
