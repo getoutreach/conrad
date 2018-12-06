@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module OutreachAuditor
+module Conrad
   # Base error class
   class Error < StandardError
     # :nodoc:

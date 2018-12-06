@@ -1,8 +1,8 @@
-require 'outreach_auditor/errors'
-require 'outreach_auditor/stdout_emitter'
-require 'outreach_auditor/json_formatter'
+require 'conrad/errors'
+require 'conrad/stdout_emitter'
+require 'conrad/json_formatter'
 
-module OutreachAuditor
+module Conrad
   # Provides the ability to record an event took place.
   # Currently recording an event accepts a hash and the values can only be one
   # of those classes listed as a scalar type. This is to prevent nesting of
@@ -11,11 +11,11 @@ module OutreachAuditor
   # @!attribute [r] formatter
   #    Configured formatter for creating the final event. Defaults to
   #    JSONFormatter.
-  #    @see OutreachAuditor::JSONFormatter
+  #    @see Conrad::JSONFormatter
   # @!attribute [r] emitter
   #    Configured emitter for sending the final event. Defaults to
   #    StdoutEmitter.
-  #    @see OutreachAuditor::StdoutEmitter
+  #    @see Conrad::StdoutEmitter
   # @!attribute [r] middlewares
   #    Configured middlewares for processing the event pre-formatting and
   #    emission. Defaults to an empty array.

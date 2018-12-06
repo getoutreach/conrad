@@ -1,9 +1,9 @@
 require 'test_helper'
-require 'outreach_auditor/timestamp_middleware'
+require 'conrad/timestamp_middleware'
 
 class TimestampMiddlewareTest < Minitest::Test
   def test_given_seconds_adds_timestamp_in_seconds
-    middleware = OutreachAuditor::TimestampMiddleware.new(:seconds)
+    middleware = Conrad::TimestampMiddleware.new(:seconds)
     event = {}
 
     Time.stub :now, stubbed_time do
@@ -12,7 +12,7 @@ class TimestampMiddlewareTest < Minitest::Test
   end
 
   def test_given_milliseconds_adds_timestamp_in_milliseconds
-    middleware = OutreachAuditor::TimestampMiddleware.new(:milliseconds)
+    middleware = Conrad::TimestampMiddleware.new(:milliseconds)
     event = {}
 
     Time.stub :now, stubbed_time do
@@ -21,7 +21,7 @@ class TimestampMiddlewareTest < Minitest::Test
   end
 
   def test_given_no_units_add_timestamp_in_milliseconds
-    middleware = OutreachAuditor::TimestampMiddleware.new
+    middleware = Conrad::TimestampMiddleware.new
     event = {}
 
     Time.stub :now, stubbed_time do
@@ -31,7 +31,7 @@ class TimestampMiddlewareTest < Minitest::Test
 
   def test_given_invalid_units_raises_argument_error
     assert_raises(ArgumentError) do
-      OutreachAuditor::TimestampMiddleware.new(:never_a_unit)
+      Conrad::TimestampMiddleware.new(:never_a_unit)
     end
   end
 
