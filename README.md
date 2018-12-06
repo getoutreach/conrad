@@ -20,11 +20,12 @@ And then execute:
 
 Conrad is built with a Rack-like architecture in mind in order to be familiar to many people. However, there are two special kinds of "middleware" in the stack: the formatter and the emitter. These are guaranteed to be the last two pieces of middleware run and handle formatting the final Hash and emitting it via your desired output.
 
-1. A program calls `Conrad.audit_event` with a Hash.
-2. This hash is run through various user-defined middlewares. Each of these must respond to `call` and return the modified event Hash.
-3. After the middleware cycle, the Hash is validated to confirm that it contains no instances of anything not included in the SCALAR_TYPES.
-4. The hash is then passed to the configured formatter to be converted into the desired format for emitting.
-5. The final value is passed to the configured emitter and emitted.
+1. Create an instance of `Conrad::Recorder`
+2. Pass a Hash to `Conrad::Recorder#audit_event`.
+3. This hash is run through various user-defined middlewares. Each of these must respond to `call` and return the modified event Hash.
+4. After the middleware cycle, the Hash is validated to confirm that it contains no instances of anything not included in the SCALAR_TYPES.
+5. The hash is then passed to the configured formatter to be converted into the desired format for emitting.
+6. The final value is passed to the configured emitter and emitted.
 
 ### Middleware
 
