@@ -23,5 +23,8 @@ run:
   - |
     set -e -x
 
+    cp source/. test/
+    cd test
+
     bundle exec rubocop --fail-level autocorrect
     bundle exec rake test
