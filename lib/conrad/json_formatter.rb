@@ -2,7 +2,7 @@
 
 require 'json'
 
-module OutreachAuditor
+module Conrad
   # Formats a given Hash into a presentable JSON format.
   class JSONFormatter
     # Formats a given Hash into a presentable JSON format.

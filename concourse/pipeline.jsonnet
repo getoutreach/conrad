@@ -1,25 +1,24 @@
 local c = import 'concourse/pipeline.libsonnet';
 
 local pipeline = c.newPipeline(
-  name = 'outreach_auditor',
-  source_repo = 'getoutreach/outreach_auditor'
+  name = 'conrad',
+  source_repo = 'getoutreach/conrad'
 ) {
    resources_: [
-     $.dockerImage($.name),
    ],
   jobs_: [
     // Master Jobs
     $.newJob('Run Tests', 'Master') {
       plan_: $.steps([
         $.newTask(
-          name = 'Test OutreachAuditor gem',
+          name = 'Test Conrad gem',
           path = 'concourse/tasks/test.yaml',
           semver = {},
           params = {},
         ),
       ]),
       on_success_: $.do([
-        $.updateGithub('Test OutreachAuditor', 'success'),
+        $.updateGithub('Test Conrad', 'success'),
         $.slackMessage(
           type = 'success',
           title = ':successkid: Master Branch Passed Tests Successfully!',
@@ -27,7 +26,7 @@ local pipeline = c.newPipeline(
         ),
       ]),
       on_failure_: $.do([
-        $.updateGithub('Test OutreachAuditor', 'failure'),
+        $.updateGithub('Test Conrad', 'failure'),
         $.slackMessage(
           type = 'failure',
           title = ":fire: Master Branch Tests Failed :'(",
@@ -39,7 +38,7 @@ local pipeline = c.newPipeline(
     $.newJob('Run PR Tests', 'Pull Request') {
       plan_: $.steps([
         $.newTask(
-          name = 'Test OutreachAuditor gem',
+          name = 'Test Conrad gem',
           path = 'concourse/tasks/test.yaml',
           pr = true,
           semver = {},
@@ -47,7 +46,7 @@ local pipeline = c.newPipeline(
         ),
       ]),
       on_success_: $.do([
-        $.updateGithub('Test OutreachAuditor gem', 'success', pr = true),
+        $.updateGithub('Test Conrad gem', 'success', pr = true),
         $.slackMessage(
           type = 'success',
           title = ':successkid: PR Passed Tests Successfully!',
@@ -62,7 +61,7 @@ local pipeline = c.newPipeline(
         ),
       ]),
       on_failure_: $.do([
-        $.updateGithub('Test OutreachAuditor gem', 'failure', pr = true),
+        $.updateGithub('Test Conrad gem', 'failure', pr = true),
         $.slackMessage(
           type = 'failure',
           title = ":fire: PR Tests Failed :'(",
