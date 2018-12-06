@@ -23,7 +23,7 @@ run:
   - |
     set -e -x
 
-    cp source/. test/
+    cp -r source/. test/
     cd test
 
     bundle exec rubocop --fail-level autocorrect
