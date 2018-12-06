@@ -23,6 +23,5 @@ run:
   - |
     set -e -x
 
-    cd test
     bundle exec rubocop --fail-level autocorrect
     bundle exec rake test
