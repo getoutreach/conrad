@@ -26,5 +26,6 @@ run:
     cp -r source/. test/
     cd test
 
+    bundle install
     bundle exec rubocop --fail-level autocorrect
     bundle exec rake test
