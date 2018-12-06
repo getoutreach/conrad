@@ -1,13 +1,13 @@
-require 'outreach_auditor/errors'
+require 'conrad/errors'
 
-module OutreachAuditor
+module Conrad
   # Used to add timestamps to an audit event in seconds or milliseconds.
   #
   # @!attribute [r] generator
   #    object used to generate the timestamp
   class TimestampMiddleware
     # :nodoc:
-    class Error < OutreachAuditor::Error; end
+    class Error < Conrad::Error; end
 
     # Types of units supported for generation.
     ALLOWED_TIME_UNITS = %i[milliseconds seconds].freeze

@@ -1,15 +1,15 @@
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'outreach_auditor/version'
+require 'conrad/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'outreach_auditor'
-  spec.version       = OutreachAuditor::VERSION
+  spec.name          = 'conrad'
+  spec.version       = Conrad::VERSION
   spec.authors       = ['Jonathon Anderson']
   spec.email         = ['jonathon.anderson@outreach.io']
 
   spec.summary       = 'Tool for auditing events.'
-  spec.homepage      = 'https://github.com/getoutreach/outreach_auditor'
+  spec.homepage      = 'https://github.com/getoutreach/conrad'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

@@ -24,10 +24,10 @@ class RecorderTest < Minitest::Test
   end
 
   def test_raises_an_argument_error_if_any_passed_items_do_not_respond_to_call
-    formatter_exception = assert_raises(ArgumentError) { OutreachAuditor::Recorder.new(formatter: 'bad formatter') }
-    emitter_exception = assert_raises(ArgumentError) { OutreachAuditor::Recorder.new(emitter: 'bad emitter') }
+    formatter_exception = assert_raises(ArgumentError) { Conrad::Recorder.new(formatter: 'bad formatter') }
+    emitter_exception = assert_raises(ArgumentError) { Conrad::Recorder.new(emitter: 'bad emitter') }
     middleware_exception = assert_raises(ArgumentError) do
-      OutreachAuditor::Recorder.new(middlewares: ['bad middleware'])
+      Conrad::Recorder.new(middlewares: ['bad middleware'])
     end
 
     assert_includes formatter_exception.message, 'bad formatter'
@@ -36,7 +36,7 @@ class RecorderTest < Minitest::Test
   end
 
   def test_calls_all_middlewares
-    recorder = OutreachAuditor::Recorder.new(
+    recorder = Conrad::Recorder.new(
       middlewares: [TestMiddleware, TestMiddleware.new, TestMiddleware.proc_version],
       emitter: return_event_proc,
       formatter: return_event_proc
@@ -51,7 +51,7 @@ class RecorderTest < Minitest::Test
   end
 
   def test_does_not_modify_event_with_no_middleware
-    recorder = OutreachAuditor::Recorder.new(
+    recorder = Conrad::Recorder.new(
       emitter: return_event_proc,
       formatter: return_event_proc
     )
@@ -62,14 +62,14 @@ class RecorderTest < Minitest::Test
   end
 
   def test_defaults_to_sending_formatted_events_to_stdout
-    recorder = OutreachAuditor::Recorder.new(formatter: return_event_proc)
+    recorder = Conrad::Recorder.new(formatter: return_event_proc)
     event = { a: 'apple' }
 
     assert_output("#{event}\n") { recorder.audit_event(event) }
   end
 
   def test_defaults_to_json_formatter
-    recorder = OutreachAuditor::Recorder.new
+    recorder = Conrad::Recorder.new
     event = { a: 'apple' }
 
     assert_output("#{event.to_json}\n") { recorder.audit_event(event) }
@@ -85,37 +85,37 @@ class RecorderTest < Minitest::Test
 
     event = { a: 'apple', b: 'bear' }
 
-    recorder = OutreachAuditor::Recorder.new(formatter: formatter)
+    recorder = Conrad::Recorder.new(formatter: formatter)
     assert_output("#{formatter.call(event)}\n") { recorder.audit_event(event) }
   end
 
   def test_raises_forbidden_value_when_given_a_hash_value
-    assert_raises(OutreachAuditor::ForbiddenValue) do
-      OutreachAuditor::Recorder.new.audit_event(bad_value: {})
+    assert_raises(Conrad::ForbiddenValue) do
+      Conrad::Recorder.new.audit_event(bad_value: {})
     end
   end
 
   def test_raises_forbidden_value_when_given_an_arbitrary_object
-    assert_raises(OutreachAuditor::ForbiddenValue) do
-      OutreachAuditor::Recorder.new.audit_event(bad_value: OutreachAuditor::Recorder.new)
+    assert_raises(Conrad::ForbiddenValue) do
+      Conrad::Recorder.new.audit_event(bad_value: Conrad::Recorder.new)
     end
   end
 
   def test_raises_forbidden_key_when_given_non_string_or_symbol_attribute
-    assert_raises(OutreachAuditor::ForbiddenKey) do
-      OutreachAuditor::Recorder.new.audit_event(1 => '')
+    assert_raises(Conrad::ForbiddenKey) do
+      Conrad::Recorder.new.audit_event(1 => '')
     end
 
-    assert_raises(OutreachAuditor::ForbiddenKey) do
-      OutreachAuditor::Recorder.new.audit_event([1, 2, 3] => '')
+    assert_raises(Conrad::ForbiddenKey) do
+      Conrad::Recorder.new.audit_event([1, 2, 3] => '')
     end
 
-    assert_raises(OutreachAuditor::ForbiddenKey) do
-      OutreachAuditor::Recorder.new.audit_event({} => '')
+    assert_raises(Conrad::ForbiddenKey) do
+      Conrad::Recorder.new.audit_event({} => '')
     end
 
-    assert_raises(OutreachAuditor::ForbiddenKey) do
-      OutreachAuditor::Recorder.new.audit_event(OutreachAuditor::Recorder.new => '')
+    assert_raises(Conrad::ForbiddenKey) do
+      Conrad::Recorder.new.audit_event(Conrad::Recorder.new => '')
     end
   end
 

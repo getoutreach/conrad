@@ -1,5 +1,5 @@
-require 'outreach_auditor/recorder'
+require 'conrad/recorder'
 
 # :nodoc:
-module OutreachAuditor
+module Conrad
 end
