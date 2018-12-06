@@ -5,7 +5,6 @@ local pipeline = c.newPipeline(
   source_repo = 'getoutreach/conrad'
 ) {
    resources_: [
-     $.dockerImage($.name),
    ],
   jobs_: [
     // Master Jobs
