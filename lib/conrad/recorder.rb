@@ -4,9 +4,9 @@ require 'conrad/json_formatter'
 
 module Conrad
   # Provides the ability to record an event took place.
-  # Currently recording an event accepts a hash and the values can only be one
-  # of those classes listed as a scalar type. This is to prevent nesting of
-  # data.
+  # Currently recording an event accepts a hash and passes it through the
+  # configured processors, formatter, and emitter. Each of these may transform,
+  # validate, format, and send the event as the user sees fit.
   #
   # @!attribute [r] formatter
   #    Configured formatter for creating the final event. Defaults to
@@ -20,9 +20,6 @@ module Conrad
   #    Configured middlewares for processing the event pre-formatting and
   #    emission. Defaults to an empty array.
   class Recorder
-    # Allowed types for values given as audit event attributes
-    SCALAR_TYPES = [String, Symbol, Integer, NilClass, FalseClass, TrueClass, Float].freeze
-
     attr_reader :formatter, :emitter, :middlewares
 
     # All arguments passed must *explicitly* respond to a `call` method.
@@ -50,15 +47,13 @@ module Conrad
     #   SCALAR_TYPES or an array once middleware processing is complete but before
     #   final formatting.
     #
-    # @raise [ForbiddenValue] when a final value of the unformatted event is not
-    #   a valid type.
     # @raise [ForbiddenKey] when a key is neither a Symbol nor a String
     def audit_event(event)
       processed_event = middlewares.reduce(event) do |old_event, processor|
         processor.call(old_event)
       end
 
-      validate_event_keys_and_values(processed_event)
+      validate_event_keys(processed_event)
 
       emitter.call(
         formatter.call(processed_event)
@@ -73,16 +68,10 @@ module Conrad
       end
     end
 
-    def validate_event_keys_and_values(event)
-      event.each do |key, value|
+    def validate_event_keys(event)
+      event.each_key do |key|
         raise ForbiddenKey, key unless key.is_a?(Symbol) || key.is_a?(String)
-
-        raise ForbiddenValue.new(key, value) unless valid_value_type?(value)
       end
-    end
-
-    def valid_value_type?(value)
-      SCALAR_TYPES.any? { |type| value.is_a? type }
     end
   end
 end
