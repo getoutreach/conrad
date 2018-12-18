@@ -16,27 +16,27 @@ module Conrad
   #    Configured emitter for sending the final event. Defaults to
   #    StdoutEmitter.
   #    @see Conrad::StdoutEmitter
-  # @!attribute [r] middlewares
-  #    Configured middlewares for processing the event pre-formatting and
+  # @!attribute [r] processors
+  #    Configured processors for processing the event pre-formatting and
   #    emission. Defaults to an empty array.
   class Recorder
-    attr_reader :formatter, :emitter, :middlewares
+    attr_reader :formatter, :emitter, :processors
 
     # All arguments passed must *explicitly* respond to a `call` method.
     #
     # @param formatter [#call] formatter for creating the final event
     # @param emitter [#call] emitter for sending the final event
-    # @param middlewares [Array<#call>] middlewares for processing the event
+    # @param processors [Array<#call>] processors for processing the event
     #   pre-formatting and emission
     #
     # @raise [ArgumentError] if the formatter, emitter, or any of the
-    #   middlewares do not respond_to? `call` with a truthy value.
-    def initialize(formatter: JSONFormatter.new, emitter: StdoutEmitter.new, middlewares: [])
-      check_callability(formatter: formatter, emitter: emitter, middlewares: middlewares)
+    #   processors do not respond_to? `call` with a truthy value.
+    def initialize(formatter: JSONFormatter.new, emitter: StdoutEmitter.new, processors: [])
+      check_callability(formatter: formatter, emitter: emitter, processors: processors)
 
       @formatter = formatter
       @emitter = emitter
-      @middlewares = middlewares
+      @processors = processors
     end
 
     # Emits an audit event through the configured Emitter
@@ -44,12 +44,12 @@ module Conrad
     # @param event [Hash] the set of key value pairs to be emitted
     #   as a single audit event. It is expected that all keys will be given as
     #   Symbols or Strings. All values should be of a type that matches the
-    #   SCALAR_TYPES or an array once middleware processing is complete but before
+    #   SCALAR_TYPES or an array once the processor cycle is complete but before
     #   final formatting.
     #
     # @raise [ForbiddenKey] when a key is neither a Symbol nor a String
     def audit_event(event)
-      processed_event = middlewares.reduce(event) do |old_event, processor|
+      processed_event = processors.reduce(event) do |old_event, processor|
         processor.call(old_event)
       end
 
@@ -62,8 +62,8 @@ module Conrad
 
     private
 
-    def check_callability(formatter:, emitter:, middlewares:)
-      [formatter, emitter, *middlewares].each do |callable|
+    def check_callability(formatter:, emitter:, processors:)
+      [formatter, emitter, *processors].each do |callable|
         raise ArgumentError, "#{callable} does not respond to `#call`" unless callable.respond_to?(:call)
       end
     end
