@@ -4,7 +4,7 @@ require 'test_helper'
 require 'json'
 
 class RecorderTest < Minitest::Test
-  class TestMiddleware
+  class TestProcessor
     def self.call(event)
       event[:class_level] = true
       event
@@ -26,18 +26,18 @@ class RecorderTest < Minitest::Test
   def test_raises_an_argument_error_if_any_passed_items_do_not_respond_to_call
     formatter_exception = assert_raises(ArgumentError) { Conrad::Recorder.new(formatter: 'bad formatter') }
     emitter_exception = assert_raises(ArgumentError) { Conrad::Recorder.new(emitter: 'bad emitter') }
-    middleware_exception = assert_raises(ArgumentError) do
-      Conrad::Recorder.new(middlewares: ['bad middleware'])
+    processor_exception = assert_raises(ArgumentError) do
+      Conrad::Recorder.new(processors: ['bad processor'])
     end
 
     assert_includes formatter_exception.message, 'bad formatter'
     assert_includes emitter_exception.message, 'bad emitter'
-    assert_includes middleware_exception.message, 'bad middleware'
+    assert_includes processor_exception.message, 'bad processor'
   end
 
-  def test_calls_all_middlewares
+  def test_calls_all_processors
     recorder = Conrad::Recorder.new(
-      middlewares: [TestMiddleware, TestMiddleware.new, TestMiddleware.proc_version],
+      processors: [TestProcessor, TestProcessor.new, TestProcessor.proc_version],
       emitter: return_event_proc,
       formatter: return_event_proc
     )
@@ -50,7 +50,7 @@ class RecorderTest < Minitest::Test
     assert recorded_event[:some_key] = 'a magic value'
   end
 
-  def test_does_not_modify_event_with_no_middleware
+  def test_does_not_modify_event_with_no_processor
     recorder = Conrad::Recorder.new(
       emitter: return_event_proc,
       formatter: return_event_proc

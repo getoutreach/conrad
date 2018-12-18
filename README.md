@@ -14,47 +14,56 @@ And then execute:
 
     $ bundle
 
-## Usage
+## Architecture
 
-### Architecture
-
-Conrad is built with a Rack-like architecture in mind in order to be familiar to many people. However, there are two special kinds of "middleware" in the stack: the formatter and the emitter. These are guaranteed to be the last two pieces of middleware run and handle formatting the final Hash and emitting it via your desired output.
+Conrad is built with a Rack-like architecture in mind in order to be familiar to many people. However, there are two special kinds of processors in the stack: the formatter and the emitter. These are guaranteed to be the last two objects called and handle formatting the final Hash and emitting it via your desired output.
 
 1. Create an instance of `Conrad::Recorder`
 2. Pass a Hash to `Conrad::Recorder#audit_event`.
-3. This hash is run through various user-defined middlewares. Each of these must respond to `call` and return the modified event Hash.
-4. After the middleware cycle, the hash is passed to the configured formatter to be converted into the desired format for emitting.
+3. This hash is run through various user-defined processors. Each of these must respond to `call` and return the event Hash to be used by the next processor in the cycle.
+4. After the processor cycle, the hash is passed to the configured formatter to be converted into the desired format for emitting.
 5. The final value is passed to the configured emitter and emitted.
 
-### Middleware
+### Processors
 
-Middleware can be configured using an attribute accessor via the Conrad configuration:
+Processors can be configured using a keyword arg via the `Conrad::Recorder` initialization:
 ```ruby
-class MyAuditMiddleware
+class MyAuditProcessor
   def self.call(event)
     event[:foobar] = 'some value'
     event
   end
 end
 
-Conrad::Recorder.new(middlewares: [TimestampMiddleware.new(:seconds), MyAuditMiddleware, -> (event) { event[:proc] = 3; event }])
+Conrad::Recorder.new(processors: [Conrad::AddTimestamp.new(:seconds), MyAuditProcessor, -> (event) { event[:proc] = 3; event }])
 ```
 
 The only requirements are that:
-1) It must respond to `call` whether that be as a Proc, lambda, class, or instance of something. Note: instances will not be regenerated on every call; a single instance would be shared across the Conrad's, and by extension the script's, lifetime.
-2) That `call` method should return a new Hash for the next piece of middleware.
+1) It must respond to `call` whether that be as a Proc, lambda, class, or instance of something. Note: instances will not be regenerated on every call; a single instance would be shared across the Recorder's, and by extension the script's, lifetime.
+2) That `call` method should return a new Hash for the next processor.
 
-### Included Middleware
+#### Included Processors
 
-* `TimestampMiddleware` - Adds a `:timestamp` attribute to your event in either seconds or milliseconds since the epoch. Usage: `require 'conrad/timestamp_middleware'` then include `Conrad::TimestampMiddleware.new(:seconds)` or `TConrad::imestampMiddleware.new(:milliseconds)` (depending on if you want units of seconds or milliseconds respectively) in your middleware configured Array.
+* `AddTimestamp` - Adds a `:timestamp` attribute to your event in either seconds or milliseconds since the epoch.
+* `AddUUID` - Adds an `:event_uuid` attribute to your event.
+
+Be sure to examine the docs for any processors for more detailed usage.
 
 ### Formatter
 
-The Formatter should be focused on formatting the final Hash into a suitable object for emitting, most likely a String. It should make no more modifications to the Hash in terms of adding or removing keys and stick to formatting values and the entire Hash itself. It should be able to respond to `call` and return the resulting value to be passed on to the emitter. The project includes a `JSONFormatter` for ease of use.
+The Formatter should be focused on formatting the final Hash into a suitable object for emitting, most likely a String. It should make no more modifications to the Hash in terms of adding or removing keys and stick to formatting values and the entire Hash itself. It should be able to respond to `call` and return the resulting value to be passed on to the emitter.
+
+#### Included Formatters
+
+* `JSONFormatter` - Formats the hash into a JSON format.
 
 ### Emitter
 
-The Emitter should be responsible for pushing your event somewhere, whether that be to STDOUT, a log file, or some external service. Like the rest of the project, the configured object must respond to `call` and no guarantee project-wide is made of the return value. The project comes with the `StdoutEmitter` for emitting to STDOUT.
+The Emitter should be responsible for pushing your event somewhere, whether that be to STDOUT, a log file, or some external service. Like the rest of the project, the configured object must respond to `call` and no guarantee project-wide is made of the return value.
+
+#### Included Emitters
+
+* `StdoutEmitter` - Emits the stringified event with a `puts` call.
 
 ## Development
 

@@ -1,12 +1,12 @@
 require 'securerandom'
 
 module Conrad
-  # Generalized middleware for inserting a UUID into the event. Allows
+  # Generalized processor for inserting a UUID into the event. Allows
   # configuring the key used for insertion.
   #
   # @!attribute [r] uuid_key
   #    The key inserted into the event hash for the generated UUID.
-  class UUIDMiddleware
+  class AddUUID
     attr_reader :uuid_key
 
     # @param uuid_key [Symbol] key to use for the generated UUID
