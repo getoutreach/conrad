@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  ruby2.4:
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
+      - checkout
+      - run:
+          name: Bundle install
+          command: bundle install
+      - run:
+          name: Rubocop
+          command: bundle exec rubocop --fail-level autocorrect
+      - run:
+          name: Run Tests
+          command: bundle exec rake test
+  ruby2.5:
+    docker:
+      - image: circleci/ruby:2.5
+    steps:
+      - checkout
+      - run:
+          name: Bundle install
+          command: bundle install
+      - run:
+          name: Rubocop
+          command: bundle exec rubocop --fail-level autocorrect
+      - run:
+          name: Run Tests
+          command: bundle exec rake test
