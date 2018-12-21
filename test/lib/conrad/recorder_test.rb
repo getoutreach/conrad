@@ -107,6 +107,23 @@ class RecorderTest < Minitest::Test
     end
   end
 
+  def test_allows_throwing_halt_conrad_processing_to_stop_processors
+    thrower = ->(_event) { throw :halt_conrad_processing }
+    verifying_processor = ->(_event) { flunk 'Should not go further in the processor stack' }
+    verifying_formatter = ->(_event) { flunk 'Should not reach the formatter' }
+    verifying_emitter = ->(_event) { flunk 'Should not reach the emitter' }
+
+    event = { a: 'apple' }
+
+    recorder = Conrad::Recorder.new(
+      processors: [thrower, verifying_processor],
+      formatter: verifying_formatter,
+      emitter: verifying_emitter
+    )
+    recorder.audit_event(event)
+    pass 'Successfully caught :halt_conrad_processing'
+  end
+
   private
 
   def return_event_proc

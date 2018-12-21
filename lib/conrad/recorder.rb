@@ -49,18 +49,30 @@ module Conrad
     #
     # @raise [ForbiddenKey] when a key is neither a Symbol nor a String
     def audit_event(event)
-      processed_event = processors.reduce(event) do |old_event, processor|
-        processor.call(old_event)
-      end
+      processed_event = process_event(event)
+
+      return unless processed_event
 
       validate_event_keys(processed_event)
 
-      emitter.call(
-        formatter.call(processed_event)
-      )
+      format_and_emit(processed_event)
     end
 
     private
+
+    def process_event(event)
+      catch :halt_conrad_processing do
+        processors.reduce(event) do |previous_built_event, processor|
+          processor.call(previous_built_event)
+        end
+      end
+    end
+
+    def format_and_emit(event)
+      emitter.call(
+        formatter.call(event)
+      )
+    end
 
     def check_callability(formatter:, emitter:, processors:)
       [formatter, emitter, *processors].each do |callable|
