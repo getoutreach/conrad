@@ -12,7 +12,7 @@ gem 'conrad', git: 'https://github.com/getoutreach/conrad'
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 ## Architecture
 
