@@ -39,7 +39,11 @@ module Conrad
       @processors = processors
     end
 
-    # Emits an audit event through the configured Emitter
+    # Processes the given event, formats it, then emits it. It is possible
+    # to `throw :halt_conrad_processing` to stop the processing stack. There
+    # should be no additional arguments to the `throw` call. At this point, the
+    # processing will stop and the audit event will be discarded. The formatter
+    # and the emitter will not be called.
     #
     # @param event [Hash] the set of key value pairs to be emitted
     #   as a single audit event. It is expected that all keys will be given as
