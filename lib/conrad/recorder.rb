@@ -39,7 +39,11 @@ module Conrad
       @processors = processors
     end
 
-    # Emits an audit event through the configured Emitter
+    # Processes the given event, formats it, then emits it. It is possible
+    # to `throw :halt_conrad_processing` to stop the processing stack. There
+    # should be no additional arguments to the `throw` call. At this point, the
+    # processing will stop and the audit event will be discarded. The formatter
+    # and the emitter will not be called.
     #
     # @param event [Hash] the set of key value pairs to be emitted
     #   as a single audit event. It is expected that all keys will be given as
@@ -49,18 +53,30 @@ module Conrad
     #
     # @raise [ForbiddenKey] when a key is neither a Symbol nor a String
     def audit_event(event)
-      processed_event = processors.reduce(event) do |old_event, processor|
-        processor.call(old_event)
-      end
+      processed_event = process_event(event)
+
+      return unless processed_event
 
       validate_event_keys(processed_event)
 
-      emitter.call(
-        formatter.call(processed_event)
-      )
+      format_and_emit(processed_event)
     end
 
     private
+
+    def process_event(event)
+      catch :halt_conrad_processing do
+        processors.reduce(event) do |previous_built_event, processor|
+          processor.call(previous_built_event)
+        end
+      end
+    end
+
+    def format_and_emit(event)
+      emitter.call(
+        formatter.call(event)
+      )
+    end
 
     def check_callability(formatter:, emitter:, processors:)
       [formatter, emitter, *processors].each do |callable|

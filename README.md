@@ -42,6 +42,8 @@ The only requirements are that:
 1) It must respond to `call` whether that be as a Proc, lambda, class, or instance of something. Note: instances will not be regenerated on every call; a single instance would be shared across the Recorder's, and by extension the script's, lifetime.
 2) That `call` method should return a new Hash for the next processor.
 
+You may also halt the processing flow by having any processor `throw :halt_conrad_processing`. This will discard the audit event and stop processing at that point. 
+
 #### Included Processors
 
 * `AddTimestamp` - Adds a `:timestamp` attribute to your event in either seconds or milliseconds since the epoch.
