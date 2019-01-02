@@ -1,5 +1,7 @@
 # Conrad Changelog
 
+## Version 1.1.0 (in development)
+
 ## Version 1.0.0
 
 * Added ability to add a UUID to an event
