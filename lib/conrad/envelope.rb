@@ -20,6 +20,8 @@ module Conrad
     #   and Symbols should not be considered interchangeable, and the event
     #   must be created with the attribute keys matching the types given here)
     # @param payload_key [Symbol] key to wrap the remainder of the event inside
+    #
+    # @raise [TypeError] if the envelope_keys argument is not an Array
     def initialize(envelope_keys, payload_key: :payload)
       raise TypeError, 'envelope_keys must be an Array' unless envelope_keys.is_a? Array
 
