@@ -7,6 +7,9 @@ module Conrad
   # a given envelope key does not exist in the original event, then it will be
   # set to nil in the resulting event.
   #
+  # When using this processor, it is highly recommended that this be the last
+  # processor unless you need to act on the wrapped event.
+  #
   # @attribute envelope_keys [r]
   # @attribute payload_key [r]
   class Envelope
