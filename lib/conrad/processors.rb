@@ -1,1 +1,1 @@
-Dir["conrad/processors/*.rb"].each {|file| require file }
+Dir['conrad/processors/*.rb'].each { |file| require file }
