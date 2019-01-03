@@ -1,6 +1,6 @@
 require 'conrad/errors'
-require 'conrad/stdout_emitter'
-require 'conrad/json_formatter'
+require 'conrad/emitters/stdout_emitter'
+require 'conrad/formatters/json_formatter'
 
 module Conrad
   # Provides the ability to record an event took place.
@@ -31,7 +31,7 @@ module Conrad
     #
     # @raise [ArgumentError] if the formatter, emitter, or any of the
     #   processors do not respond_to? `call` with a truthy value.
-    def initialize(formatter: JSONFormatter.new, emitter: StdoutEmitter.new, processors: [])
+    def initialize(formatter: Conrad::Formatters::JSONFormatter.new, emitter: Conrad::Emitters::StdoutEmitter.new, processors: [])
       check_callability(formatter: formatter, emitter: emitter, processors: processors)
 
       @formatter = formatter
