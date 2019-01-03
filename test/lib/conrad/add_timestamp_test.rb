@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'conrad/processors/add_timestamp'
 
 class AddTimestampTest < Minitest::Test
   def test_given_seconds_adds_timestamp_in_seconds

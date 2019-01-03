@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'conrad/envelope'
 
 class EnvelopeTest < Minitest::Test
   def test_raises_type_error_for_non_array_envelope_keys

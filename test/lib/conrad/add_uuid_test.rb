@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'conrad/processors/add_uuid'
 
 class AddUUIDTest < Minitest::Test
   def test_adds_uuid_to_hash
