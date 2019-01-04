@@ -35,7 +35,7 @@ class MyAuditProcessor
   end
 end
 
-Conrad::Recorder.new(processors: [Conrad::AddTimestamp.new(:seconds), MyAuditProcessor, -> (event) { event[:proc] = 3; event }])
+Conrad::Recorder.new(processors: [Conrad::Processors::AddTimestamp.new(:seconds), MyAuditProcessor, -> (event) { event[:proc] = 3; event }])
 ```
 
 The only requirements are that:
