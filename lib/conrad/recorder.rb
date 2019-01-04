@@ -1,6 +1,6 @@
 require 'conrad/errors'
-require 'conrad/emitters/stdout_emitter'
-require 'conrad/formatters/json_formatter'
+require 'conrad/emitters/stdout'
+require 'conrad/formatters/json'
 
 module Conrad
   # Provides the ability to record an event took place.
