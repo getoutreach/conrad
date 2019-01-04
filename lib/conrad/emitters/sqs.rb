@@ -1,14 +1,31 @@
 module Conrad
+  # A module containing all of conrad's built in event emitters for outputting events
   module Emitters
     # Basic emitter for sending events to AWS's sqs.
     class Sqs
+      attr_reader :queue_url, :region, :access_key_id, :secret_access_key
+
+      # Takes in and stores SQS region, url and creds for accessing a queue.
+      def initialize(queue_url:, region:, access_key_id:, secret_access_key:)
+        @queue_url = queue_url
+        @region = region
+        @access_key_id = access_key_id
+        @secret_access_key = secret_access_key
+      end
+
+      # Sends an event up to SQS
       def call(event)
-        sqs = Aws::SQS::Client.new(
-          region: ENV['SQS_REGION'],
-          access_key_id: ENV['SQS_ACCESS_KEY_ID'],
-          secret_access_key: ENV['SQS_SECRET_ACCESS_KEY']
+        client.send_message(queue_url: queue_url, message_body: event)
+      end
+
+      private
+
+      def client
+        @client ||= Aws::SQS::Client.new(
+            region: region,
+            access_key_id: access_key_id,
+            secret_access_key: secret_access_key
         )
-        sqs.send_message(queue_url: ENV['SQS_QUEUE_URL'], message_body: event)
       end
     end
   end

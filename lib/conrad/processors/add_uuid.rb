@@ -1,6 +1,7 @@
 require 'securerandom'
 
 module Conrad
+  # A module containing conrad's processors. They're used to modify events or add metadata before being output.
   module Processors
     # Generalized processor for inserting a UUID into the event. Allows
     # configuring the key used for insertion.

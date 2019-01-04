@@ -58,7 +58,7 @@ The Formatter should be focused on formatting the final Hash into a suitable obj
 
 #### Included Formatters
 
-* `JSONFormatter` - Formats the hash into a JSON format.
+* `JSON` - Formats the hash into a JSON format.
 
 ### Emitter
 
@@ -66,7 +66,8 @@ The Emitter should be responsible for pushing your event somewhere, whether that
 
 #### Included Emitters
 
-* `StdoutEmitter` - Emits the stringified event with a `puts` call.
+* `Stdout` - Emits the stringified event with a `puts` call.
+* `Sqs` - Emits the stringified event to an SQS queue using a region, url and your access key and secret key.
 
 ## Development
 
