@@ -1,6 +1,9 @@
 # Conrad Changelog
 
-## Version 1.1.0 (in development)
+## Version 2.0.0
+* Added ability to wrap events in an Envelope [#13](https://github.com/getoutreach/conrad/pull/13)
+* **BREAKING CHANGE** Nested provided Processors, Emitters, and Formatters inside of modules and folders [#14](https://github.com/getoutreach/conrad/pull/14)
+* Introduced an emitter for sending events to SQS [#14](https://github.com/getoutreach/conrad/pull/14)
 
 ## Version 1.0.0
 
