@@ -1,9 +1,8 @@
 require 'test_helper'
-require 'conrad/add_timestamp'
 
 class AddTimestampTest < Minitest::Test
   def test_given_seconds_adds_timestamp_in_seconds
-    processor = Conrad::AddTimestamp.new(units: :seconds)
+    processor = Conrad::Processors::AddTimestamp.new(units: :seconds)
     event = {}
 
     Time.stub :now, stubbed_time do
@@ -12,7 +11,7 @@ class AddTimestampTest < Minitest::Test
   end
 
   def test_given_milliseconds_adds_timestamp_in_milliseconds
-    processor = Conrad::AddTimestamp.new(units: :milliseconds)
+    processor = Conrad::Processors::AddTimestamp.new(units: :milliseconds)
     event = {}
 
     Time.stub :now, stubbed_time do
@@ -21,7 +20,7 @@ class AddTimestampTest < Minitest::Test
   end
 
   def test_given_no_units_add_timestamp_in_milliseconds
-    processor = Conrad::AddTimestamp.new
+    processor = Conrad::Processors::AddTimestamp.new
     event = {}
 
     Time.stub :now, stubbed_time do
@@ -31,12 +30,12 @@ class AddTimestampTest < Minitest::Test
 
   def test_given_invalid_units_raises_argument_error
     assert_raises(ArgumentError) do
-      Conrad::AddTimestamp.new(units: :never_a_unit)
+      Conrad::Processors::AddTimestamp.new(units: :never_a_unit)
     end
   end
 
   def test_allows_changing_the_timestamp_key
-    processor = Conrad::AddTimestamp.new(timestamp_key: :when)
+    processor = Conrad::Processors::AddTimestamp.new(timestamp_key: :when)
     event = {}
 
     Time.stub :now, stubbed_time do

@@ -1,3 +1,1 @@
-require 'conrad/add_timestamp'
-require 'conrad/add_uuid'
-require 'conrad/envelope'
+Dir['conrad/processors/*.rb'].each { |file| require file }
