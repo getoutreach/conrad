@@ -1,6 +1,7 @@
 require 'conrad/errors'
 require 'conrad/emitters/stdout'
 require 'conrad/formatters/json'
+require 'conrad/processor_stack'
 
 module Conrad
   # Provides the ability to record an event took place.
@@ -40,7 +41,7 @@ module Conrad
 
       @formatter = formatter
       @emitter = emitter
-      @processors = processors
+      @processors = Conrad::ProcessorStack.new(processors)
     end
 
     # Processes the given event, formats it, then emits it. It is possible
@@ -57,7 +58,7 @@ module Conrad
     #
     # @raise [ForbiddenKey] when a key is neither a Symbol nor a String
     def audit_event(event)
-      processed_event = process_event(event)
+      processed_event = processors.call(event)
 
       return unless processed_event
 
@@ -68,14 +69,6 @@ module Conrad
 
     private
 
-    def process_event(event)
-      catch :halt_conrad_processing do
-        processors.reduce(event) do |previous_built_event, processor|
-          processor.call(previous_built_event)
-        end
-      end
-    end
-
     def format_and_emit(event)
       emitter.call(
         formatter.call(event)
@@ -83,7 +76,7 @@ module Conrad
     end
 
     def check_callability(formatter:, emitter:, processors:)
-      [formatter, emitter, *processors].each do |callable|
+      [formatter, emitter].each do |callable|
         raise ArgumentError, "#{callable} does not respond to `#call`" unless callable.respond_to?(:call)
       end
     end
