@@ -37,7 +37,7 @@ module Conrad
       emitter: Conrad::Emitters::Stdout.new,
       processors: []
     )
-      check_callability(formatter: formatter, emitter: emitter, processors: processors)
+      check_callability(formatter: formatter, emitter: emitter)
 
       @formatter = formatter
       @emitter = emitter
@@ -75,7 +75,7 @@ module Conrad
       )
     end
 
-    def check_callability(formatter:, emitter:, processors:)
+    def check_callability(formatter:, emitter:)
       [formatter, emitter].each do |callable|
         raise ArgumentError, "#{callable} does not respond to `#call`" unless callable.respond_to?(:call)
       end

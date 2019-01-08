@@ -113,7 +113,6 @@ module Conrad
       end
     end
 
-
     def reset_state!
       event_metadata.clear
       events.clear

@@ -1,6 +1,8 @@
 require 'forwardable'
 
 module Conrad
+  # Contains the main logic to share how processors are handled between the
+  # individual, one-off recorder and the collector.
   class ProcessorStack
     include Enumerable
     extend Forwardable
