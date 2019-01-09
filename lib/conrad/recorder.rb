@@ -12,14 +12,14 @@ module Conrad
   # @!attribute [r] formatter
   #    Configured formatter for creating the final event. Defaults to
   #    JSON.
-  #    @see Conrad::JSON
+  #    @see Conrad::Formatters::JSON
   # @!attribute [r] emitter
   #    Configured emitter for sending the final event. Defaults to
   #    Stdout.
-  #    @see Conrad::Stdout
+  #    @see Conrad::Emitters::Stdout
   # @!attribute [r] processors
   #    Configured processors for processing the event pre-formatting and
-  #    emission. Defaults to an empty array.
+  #    emission. Defaults to an empty enumerable.
   class Recorder
     attr_reader :formatter, :emitter, :processors
 
@@ -52,9 +52,7 @@ module Conrad
     #
     # @param event [Hash] the set of key value pairs to be emitted
     #   as a single audit event. It is expected that all keys will be given as
-    #   Symbols or Strings. All values should be of a type that matches the
-    #   SCALAR_TYPES or an array once the processor cycle is complete but before
-    #   final formatting.
+    #   Symbols or Strings.
     #
     # @raise [ForbiddenKey] when a key is neither a Symbol nor a String
     def audit_event(event)

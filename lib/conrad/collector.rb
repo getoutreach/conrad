@@ -12,13 +12,10 @@ module Conrad
   # spawned that use this configuration. The exception to that is the
   # `event_metadata` which should be per collector using:
   # `Conrad::Collector.current.event_metadata = { whatever: 'you want' }`
+  #
+  # A single instance can also be created. By default it will use any values
+  # configured for the class, but accepts override as keyword arguments.
   class Collector
-    # Used to setup metadata that will be added to every event in the collection
-    attr_accessor :event_metadata
-
-    # The events stored in the collector
-    attr_reader :events
-
     class << self
       # The set of Processors to use for each event added to the Collector
       attr_writer :processors
@@ -47,7 +44,7 @@ module Conrad
       #   otherwise initializes to an empty stack.
       def processor_stack
         @processor_stack ||= if @processors.nil?
-                               Conrad::ProcessorStack.new
+                               Conrad::ProcessorStack.new([])
                              else
                                Conrad::ProcessorStack.new(@processors)
                              end
@@ -55,12 +52,12 @@ module Conrad
 
       # @return the configured formatter. Defaults to Conrad::Formatters::Json
       def formatter
-        @formatter ||= Conrad::Formatters::Json.new
+        @formatter ||= Conrad::Formatters::JSON.new
       end
 
       # @return the configured emitter. Defaults to Conrad::Emitters::Stdout
       def emitter
-        @emitter ||= Conrad::Emitters::Stdout
+        @emitter ||= Conrad::Emitters::Stdout.new
       end
 
       # @return [Boolean] indicator of if events should be emitted as a batch or
@@ -70,8 +67,45 @@ module Conrad
       end
     end
 
-    def initialize
+    # Used to setup metadata that will be added to every event in the collection
+    attr_accessor :event_metadata
+
+    # The events stored in the collector
+    attr_reader :events
+
+    # ProcessorStack used on each event added
+    attr_reader :processors
+
+    # Formatter used to generate sendable format for an Event
+    attr_reader :formatter
+
+    # Emitter used to send out events
+    attr_reader :emitter
+
+    # Boolean indicating if events should be sent as a batch or individually
+    attr_reader :emit_as_batch
+    alias emit_as_batch? emit_as_batch
+
+    # @param processors [Array<#call>] set of processors to run. Defaults to
+    #   processors as configured for the class.
+    # @param formatter [#call] Formatter to use. Defaults to
+    #   formatter as configured for the class.
+    # @param emitter [#call] emitter to send events. Defaults to
+    #   emitter as configured for the class.
+    # @param emit_as_batch [Boolean] indicates how to send events. Defaults to
+    #   value configured for class.
+    def initialize(
+      processors: self.class.processor_stack,
+      formatter: self.class.formatter,
+      emitter: self.class.emitter,
+      emit_as_batch: self.class.emit_as_batch?
+    )
       @events = []
+      @event_metadata = {}
+      @processors = processors.is_a?(Array) ? Conrad::ProcessorStack.new(processors) : processors
+      @formatter = formatter
+      @emitter = emitter
+      @emit_as_batch = emit_as_batch
     end
 
     # Adds an event to the Collector to be audited at a later time. The
@@ -98,7 +132,7 @@ module Conrad
         record_individual_events
       end
 
-      reset_state!
+      reset_state
     end
 
     private
@@ -113,26 +147,9 @@ module Conrad
       end
     end
 
-    def reset_state!
+    def reset_state
       event_metadata.clear
       events.clear
-    end
-
-    # Attributes read from the class variables set.
-    def processors
-      self.class.processor_stack
-    end
-
-    def formatter
-      self.class.formatter
-    end
-
-    def emitter
-      self.class.emitter
-    end
-
-    def emit_as_batch?
-      self.class.emit_as_batch?
     end
   end
 end
