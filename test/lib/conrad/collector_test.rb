@@ -109,7 +109,7 @@ class CollectorTest < Minitest::Test
     Conrad::Collector.current.add_event(foo: 'bar')
     Conrad::Collector.current.add_event(boom: 'shaka')
 
-    assert_equal [{ foo: 'bar', meta: 'totally'}, { boom: 'shaka', meta: 'totally' }], Conrad::Collector.current.events
+    assert_equal [{ foo: 'bar', meta: 'totally' }, { boom: 'shaka', meta: 'totally' }], Conrad::Collector.current.events
   end
 
   def test_metadata_is_isolated_across_threads
@@ -147,21 +147,21 @@ class CollectorTest < Minitest::Test
   end
 
   def test_allows_configuring_formatter_at_instance_level
-    some_proc = -> (event) { event.to_s }
+    some_proc = ->(event) { event.to_s }
     collector = Conrad::Collector.new(formatter: some_proc)
 
     assert_equal some_proc, collector.formatter
   end
 
   def test_allows_configuring_processor_stack_at_instance_level
-    some_proc = -> (event) { event.to_s }
+    some_proc = ->(event) { event.to_s }
     collector = Conrad::Collector.new(processors: [some_proc])
 
     assert_equal [some_proc], collector.processors.to_a
   end
 
   def test_allows_configuring_emitter_at_instance_level
-    some_proc = -> (event) { event.to_s }
+    some_proc = ->(event) { event.to_s }
     collector = Conrad::Collector.new(emitter: some_proc)
 
     assert_equal some_proc, collector.emitter
