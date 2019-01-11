@@ -1,5 +1,8 @@
 # Conrad Changelog
 
+## Version 2.1.0
+* Add `Conrad::Collector` for collecting batches of events [#16](https://github.com/getoutreach/conrad/pull/16)
+
 ## Version 2.0.0
 * Added ability to wrap events in an Envelope [#13](https://github.com/getoutreach/conrad/pull/13)
 * **BREAKING CHANGE** Nested provided Processors, Emitters, and Formatters inside of modules and folders [#14](https://github.com/getoutreach/conrad/pull/14)

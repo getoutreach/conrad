@@ -24,6 +24,8 @@ Conrad is built with a Rack-like architecture in mind in order to be familiar to
 4. After the processor cycle, the hash is passed to the configured formatter to be converted into the desired format for emitting.
 5. The final value is passed to the configured emitter and emitted.
 
+Alternatively, you can use and configure a `Conrad::Collector` to collect batches of events that might share common metadata, such as a `request_id` for a web server that needs to be tracked across all events. Using `Conrad::Collector.current` to `add_event`s gives you access to an instance of `Conrad::Collector` per thread. You can configure default processors, emitter, and formatters for `Conrad::Collector`s by configuring the relevant `default_` attributes. There is also an option to emit the events as a batch by creating an emitter capable of accepting an Array of formatted events. The written emitter then handles the batch however it wishes.
+
 ### Processors
 
 Processors can be configured using a keyword arg via the `Conrad::Recorder` initialization:
