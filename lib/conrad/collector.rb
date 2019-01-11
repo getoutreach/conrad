@@ -1,6 +1,7 @@
 require 'conrad/formatters/json'
 require 'conrad/emitters/stdout'
 require 'conrad/processor_stack'
+require 'conrad/errors'
 
 module Conrad
   # Used to collect a batch of events and send them using the configured
@@ -17,21 +18,24 @@ module Conrad
   # configured for the class, but accepts override as keyword arguments.
   class Collector
     class << self
-      # The set of Processors to use for each event added to the Collector
-      attr_writer :processors
+      # The set of Processors to use for each event added to each collector
+      # created, by default. Must respond to #call
+      attr_writer :default_processors
 
-      # The Formatter to format each event added to the Collector
-      attr_writer :formatter
+      # The Formatter to format each event added to each collector created, by
+      #   default. Must respond to #call
+      attr_writer :default_formatter
 
-      # The Emitter to use for sending events to another place. This should
-      # respond to #call. If `emit_as_batch` is set to true, this method *must*
-      # accept an Array of events. Otherwise, it is expected to accept a Hash.
-      attr_writer :emitter
+      # The Emitter to use for sending events to another place, added to each
+      # collector by default. This should respond to #call. If `emit_as_batch`
+      # is set to true, this method *must* accept an Array of events. Otherwise,
+      # it is expected to accept a Hash.
+      attr_writer :default_emitter
 
       # Boolean indicating if the events collected should be emitted as a batch
       # and sent as an Array to to the configured emitter or if they should
       # instead be sent one-by-one. Defaults to false.
-      attr_writer :emit_as_batch
+      attr_accessor :default_emit_as_batch
 
       # @return [Conrad::Collector] the collector for a given Thread that is
       #   currently active
@@ -39,31 +43,19 @@ module Conrad
         Thread.current[:conrad_collector] ||= new
       end
 
-      # @return [Conrad::ProcessorStack] processors used for every event added
-      #   to the collector. Uses the configured processors if available,
-      #   otherwise initializes to an empty stack.
-      def processor_stack
-        @processor_stack ||= if @processors.nil?
-                               Conrad::ProcessorStack.new([])
-                             else
-                               Conrad::ProcessorStack.new(@processors)
-                             end
-      end
-
       # @return the configured formatter. Defaults to Conrad::Formatters::Json
-      def formatter
-        @formatter ||= Conrad::Formatters::JSON.new
+      def default_formatter
+        @default_formatter || Conrad::Formatters::JSON.new
       end
 
       # @return the configured emitter. Defaults to Conrad::Emitters::Stdout
-      def emitter
-        @emitter ||= Conrad::Emitters::Stdout.new
+      def default_emitter
+        @default_emitter || Conrad::Emitters::Stdout.new
       end
 
-      # @return [Boolean] indicator of if events should be emitted as a batch or
-      #   individually
-      def emit_as_batch?
-        @emit_as_batch
+      # @return [Array<#call>]
+      def default_processors
+        @default_processors || []
       end
     end
 
@@ -77,13 +69,14 @@ module Conrad
     attr_reader :processors
 
     # Formatter used to generate sendable format for an Event
-    attr_reader :formatter
+    attr_accessor :formatter
 
     # Emitter used to send out events
-    attr_reader :emitter
+    attr_accessor :emitter
 
-    # Boolean indicating if events should be sent as a batch or individually
-    attr_reader :emit_as_batch
+    # Boolean indicating if events should be sent as a batch or individually by
+    #   default for each Collector instance
+    attr_accessor :emit_as_batch
     alias emit_as_batch? emit_as_batch
 
     # @param processors [Array<#call>] set of processors to run. Defaults to
@@ -95,14 +88,15 @@ module Conrad
     # @param emit_as_batch [Boolean] indicates how to send events. Defaults to
     #   value configured for class.
     def initialize(
-      processors: self.class.processor_stack,
-      formatter: self.class.formatter,
-      emitter: self.class.emitter,
-      emit_as_batch: self.class.emit_as_batch?
+      processors: self.class.default_processors,
+      formatter: self.class.default_formatter,
+      emitter: self.class.default_emitter,
+      emit_as_batch: self.class.default_emit_as_batch
     )
       @events = []
       @event_metadata = {}
-      @processors = processors.is_a?(Array) ? Conrad::ProcessorStack.new(processors) : processors
+      @processors = processors
+      @processor_stack = Conrad::ProcessorStack.new(processors)
       @formatter = formatter
       @emitter = emitter
       @emit_as_batch = emit_as_batch
@@ -115,10 +109,14 @@ module Conrad
     # the event will not be added to the collection.
     #
     # @param event [Hash]
+    #
+    # @raise [ForbiddenKey] when a key is neither a Symbol nor a String
     def add_event(event)
-      processed_event = processors.call(event.merge(event_metadata))
+      processed_event = processor_stack.call(event.merge(event_metadata))
 
       return unless processed_event
+
+      validate_event_keys(processed_event)
 
       events << formatter.call(processed_event)
     end
@@ -135,7 +133,22 @@ module Conrad
       reset_state
     end
 
+    # Attribute writer for changing the processors for an instance of a
+    # Collector
+    def processors=(processors)
+      @processor_stack = Conrad::ProcessorStack.new(processors)
+      @processors = processors
+    end
+
     private
+
+    attr_reader :processor_stack
+
+    def validate_event_keys(event)
+      event.each_key do |key|
+        raise ForbiddenKey, key unless key.is_a?(Symbol) || key.is_a?(String)
+      end
+    end
 
     def record_events_as_batch
       emitter.call(events)

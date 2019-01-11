@@ -5,6 +5,10 @@ Metrics/MethodLength:
   Exclude:
     - 'test/**/*'
 
+Metrics/ClassLength:
+  Exclude:
+    - 'test/**/*'
+
 Style/Documentation:
   Exclude:
     - 'test/**/*'

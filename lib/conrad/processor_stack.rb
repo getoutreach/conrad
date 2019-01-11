@@ -1,6 +1,7 @@
 require 'forwardable'
 
 module Conrad
+  # @api private
   # Contains the main logic to share how processors are handled between the
   # individual, one-off recorder and the collector.
   class ProcessorStack

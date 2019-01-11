@@ -41,7 +41,8 @@ module Conrad
 
       @formatter = formatter
       @emitter = emitter
-      @processors = Conrad::ProcessorStack.new(processors)
+      @processors = processors
+      @processor_stack = Conrad::ProcessorStack.new(processors)
     end
 
     # Processes the given event, formats it, then emits it. It is possible
@@ -56,7 +57,7 @@ module Conrad
     #
     # @raise [ForbiddenKey] when a key is neither a Symbol nor a String
     def audit_event(event)
-      processed_event = processors.call(event)
+      processed_event = processor_stack.call(event)
 
       return unless processed_event
 
@@ -67,6 +68,14 @@ module Conrad
 
     private
 
+    attr_reader :processor_stack
+
+    def validate_event_keys(event)
+      event.each_key do |key|
+        raise ForbiddenKey, key unless key.is_a?(Symbol) || key.is_a?(String)
+      end
+    end
+
     def format_and_emit(event)
       emitter.call(
         formatter.call(event)
@@ -76,12 +85,6 @@ module Conrad
     def check_callability(formatter:, emitter:)
       [formatter, emitter].each do |callable|
         raise ArgumentError, "#{callable} does not respond to `#call`" unless callable.respond_to?(:call)
-      end
-    end
-
-    def validate_event_keys(event)
-      event.each_key do |key|
-        raise ForbiddenKey, key unless key.is_a?(Symbol) || key.is_a?(String)
       end
     end
   end

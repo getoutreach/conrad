@@ -31,11 +31,10 @@ class CollectorTest < Minitest::Test
   end
 
   def teardown
-    Conrad::Collector.instance_variable_set(:@emit_as_batch, nil)
-    Conrad::Collector.instance_variable_set(:@processor_stack, nil)
-    Conrad::Collector.instance_variable_set(:@processors, nil)
-    Conrad::Collector.instance_variable_set(:@emitter, nil)
-    Conrad::Collector.instance_variable_set(:@formatter, nil)
+    Conrad::Collector.instance_variable_set(:@default_emit_as_batch, nil)
+    Conrad::Collector.instance_variable_set(:@default_processors, nil)
+    Conrad::Collector.instance_variable_set(:@default_emitter, nil)
+    Conrad::Collector.instance_variable_set(:@default_formatter, nil)
 
     Thread.current[:conrad_collector] = nil
   end
@@ -51,7 +50,7 @@ class CollectorTest < Minitest::Test
   end
 
   def test_does_not_just_emit_events_added
-    Conrad::Collector.emitter = ->(_event) { raise 'Should not emit event' }
+    Conrad::Collector.current.emitter = ->(_event) { raise 'Should not emit event' }
 
     Conrad::Collector.current.add_event(foo: 'bar')
     Conrad::Collector.current.add_event(fizz: 'bazz')
@@ -60,8 +59,8 @@ class CollectorTest < Minitest::Test
   end
 
   def test_does_not_add_events_when_halt_conrad_processing_is_thrown
-    Conrad::Collector.processors = [ProcessorDropsEven.new]
-    Conrad::Collector.emitter = ->(_event) { raise 'Should not emit event' }
+    Conrad::Collector.current.processors = [ProcessorDropsEven.new]
+    Conrad::Collector.current.emitter = ->(_event) { raise 'Should not emit event' }
 
     Conrad::Collector.current.add_event(will_be: 'there')
     Conrad::Collector.current.add_event(is_not: 'there')
@@ -73,8 +72,8 @@ class CollectorTest < Minitest::Test
   def test_emits_events_individually_by_default
     emitter = CollectingEmitter.new
 
-    Conrad::Collector.emitter = emitter
-    Conrad::Collector.formatter = PASS_THROUGH
+    Conrad::Collector.current.emitter = emitter
+    Conrad::Collector.current.formatter = PASS_THROUGH
 
     Conrad::Collector.current.add_event(foo: 'bar')
     Conrad::Collector.current.add_event(fizz: 'bazz')
@@ -87,9 +86,9 @@ class CollectorTest < Minitest::Test
   def test_allows_emitting_events_as_a_batch
     emitter = CollectingEmitter.new
 
-    Conrad::Collector.emitter = emitter
-    Conrad::Collector.formatter = PASS_THROUGH
-    Conrad::Collector.emit_as_batch = true
+    Conrad::Collector.current.emitter = emitter
+    Conrad::Collector.current.formatter = PASS_THROUGH
+    Conrad::Collector.current.emit_as_batch = true
 
     Conrad::Collector.current.add_event(foo: 'bar')
     Conrad::Collector.current.add_event(fizz: 'bazz')
@@ -102,8 +101,8 @@ class CollectorTest < Minitest::Test
   def test_adds_metadata_to_every_event_added
     emitter = CollectingEmitter.new
 
-    Conrad::Collector.formatter = PASS_THROUGH
-    Conrad::Collector.emitter = emitter
+    Conrad::Collector.current.formatter = PASS_THROUGH
+    Conrad::Collector.current.emitter = emitter
     Conrad::Collector.current.event_metadata = { meta: 'totally' }
 
     Conrad::Collector.current.add_event(foo: 'bar')
@@ -115,15 +114,13 @@ class CollectorTest < Minitest::Test
   def test_metadata_is_isolated_across_threads
     emitter = CollectingEmitter.new
 
-    Conrad::Collector.formatter = PASS_THROUGH
-    Conrad::Collector.emitter = emitter
+    Conrad::Collector.default_formatter = PASS_THROUGH
+    Conrad::Collector.default_emitter = emitter
     Conrad::Collector.current.event_metadata = { meta: 'totally' }
 
     other_thread = Thread.new do
       Conrad::Collector.current.event_metadata = { separate_thread: true }
-
       Conrad::Collector.current.add_event(other_thread: 'multithread')
-
       Conrad::Collector.current.events
     end
 
@@ -136,7 +133,7 @@ class CollectorTest < Minitest::Test
   end
 
   def test_clears_events_and_metadata_after_sending_events
-    Conrad::Collector.emitter = PASS_THROUGH
+    Conrad::Collector.current.emitter = PASS_THROUGH
     Conrad::Collector.current.event_metadata = { whatever: 'who cares' }
 
     Conrad::Collector.current.add_event(foo: 'bar')
@@ -148,22 +145,52 @@ class CollectorTest < Minitest::Test
 
   def test_allows_configuring_formatter_at_instance_level
     some_proc = ->(event) { event.to_s }
-    collector = Conrad::Collector.new(formatter: some_proc)
 
+    collector = Conrad::Collector.new(formatter: some_proc)
+    assert_equal some_proc, collector.formatter
+
+    collector = Conrad::Collector.new
+    refute_equal some_proc, collector.formatter
+    collector.formatter = some_proc
     assert_equal some_proc, collector.formatter
   end
 
-  def test_allows_configuring_processor_stack_at_instance_level
+  def test_allows_configuring_processors_at_instance_level
     some_proc = ->(event) { event.to_s }
-    collector = Conrad::Collector.new(processors: [some_proc])
 
-    assert_equal [some_proc], collector.processors.to_a
+    collector = Conrad::Collector.new(processors: [some_proc])
+    assert_equal [some_proc], collector.processors
+
+    collector = Conrad::Collector.new
+    refute_equal [some_proc], collector.processors
+    collector.processors = [some_proc]
+    assert_equal [some_proc], collector.processors
   end
 
   def test_allows_configuring_emitter_at_instance_level
     some_proc = ->(event) { event.to_s }
-    collector = Conrad::Collector.new(emitter: some_proc)
 
+    collector = Conrad::Collector.new(emitter: some_proc)
     assert_equal some_proc, collector.emitter
+
+    # assignment
+    collector = Conrad::Collector.new
+    refute_equal some_proc, collector.emitter
+    collector.emitter = some_proc
+    assert_equal some_proc, collector.emitter
+  end
+
+  def test_validates_keys_for_events_are_strings_or_symbols
+    assert_raises(Conrad::ForbiddenKey, 'Invalid number key') do
+      Conrad::Collector.current.add_event(1 => 'failure')
+    end
+
+    assert_raises(Conrad::ForbiddenKey, 'Invalid array key') do
+      Conrad::Collector.current.add_event([] => 'failure')
+    end
+
+    assert_raises(Conrad::ForbiddenKey, 'Invalid hash key') do
+      Conrad::Collector.current.add_event({} => 'failure')
+    end
   end
 end
