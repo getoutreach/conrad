@@ -37,6 +37,10 @@ module Conrad
       # instead be sent one-by-one. Defaults to false.
       attr_accessor :default_emit_as_batch
 
+      # Allows assigning a default logger to use for logging out of the gem.
+      # Should respond to #debug, #info, #warn, #error, and #fatal.
+      attr_accessor :default_logger
+
       # @return [Conrad::Collector] the collector for a given Thread that is
       #   currently active
       def current
@@ -79,6 +83,9 @@ module Conrad
     attr_accessor :emit_as_batch
     alias emit_as_batch? emit_as_batch
 
+    # Logger object used for sending log events
+    attr_accessor :logger
+
     # @param processors [Array<#call>] set of processors to run. Defaults to
     #   processors as configured for the class.
     # @param formatter [#call] Formatter to use. Defaults to
@@ -91,7 +98,8 @@ module Conrad
       processors: self.class.default_processors,
       formatter: self.class.default_formatter,
       emitter: self.class.default_emitter,
-      emit_as_batch: self.class.default_emit_as_batch
+      emit_as_batch: self.class.default_emit_as_batch,
+      logger: self.class.default_logger
     )
       @events = []
       @event_metadata = {}
@@ -100,6 +108,7 @@ module Conrad
       @formatter = formatter
       @emitter = emitter
       @emit_as_batch = emit_as_batch
+      @logger = logger
     end
 
     # Adds an event to the Collector to be audited at a later time. The
@@ -123,13 +132,18 @@ module Conrad
 
     # Records the events currently in the collection then clears the state of
     # the Collector by emptying the events stack and clearing out the metadata.
+    #
+    # @note Currently for emitting individual events, if an error is raised then
+    #   a log message will be attempted using the configured logger. For batch
+    #   emitted events, the error will be allowed to bubble up. This is to
+    #   prevent the unexpected loss of events if a single one is malformed.
     def record_events
       if emit_as_batch?
         record_events_as_batch
       else
         record_individual_events
       end
-
+    ensure
       reset_state
     end
 
@@ -138,6 +152,15 @@ module Conrad
     def processors=(processors)
       @processor_stack = Conrad::ProcessorStack.new(processors)
       @processors = processors
+    end
+
+    # Adds the given hash of data to the already existing event metadata
+    #
+    # @param new_metadata [Hash]
+    #
+    # @return nothing
+    def add_metadata(new_metadata)
+      event_metadata.merge!(new_metadata)
     end
 
     private
@@ -156,13 +179,23 @@ module Conrad
 
     def record_individual_events
       events.each do |event|
-        emitter.call(event)
+        begin
+          emitter.call(event)
+        rescue StandardError => e
+          write_log(:error, e)
+        end
       end
     end
 
     def reset_state
       event_metadata.clear
       events.clear
+    end
+
+    def write_log(level, data)
+      return unless logger
+
+      logger.public_send(level, data)
     end
   end
 end
