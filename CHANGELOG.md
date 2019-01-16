@@ -1,5 +1,11 @@
 # Conrad Changelog
 
+## Version 2.2.0
+* Bug fix: ensure that `Conrad::Collector` metadata is reset even when emitting raises an error [#20](https://github.com/getoutreach/conrad/pull/20/)
+* Bug fix: errors on emitting individual events does not prevent the collector from emitting the rest [#20](https://github.com/getoutreach/conrad/pull/20/)
+* Bug fix: expose API for adding event metadata for `Conrad::Collector` [#20](https://github.com/getoutreach/conrad/pull/20/)
+* Add logger to `Conrad::Collector` [#20](https://github.com/getoutreach/conrad/pull/20/)
+
 ## Version 2.1.0
 * Add `Conrad::Collector` for collecting batches of events [#16](https://github.com/getoutreach/conrad/pull/16)
 
