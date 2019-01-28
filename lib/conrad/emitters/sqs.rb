@@ -13,7 +13,7 @@ module Conrad
       class InvalidAwsCredentials < ::Conrad::Error
         # :nodoc:
         def to_s
-          'Must provide secret_access_key, access_key_id, and region OR rely ' \
+          'Must provide secret_access_key and access_key_id OR rely ' \
           'on configured values in the running environment.'
         end
       end
