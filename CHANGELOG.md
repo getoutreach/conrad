@@ -1,5 +1,8 @@
 # Conrad Changelog
 
+## Version 2.3.1
+* Bug fix: `region` is not stored in a credentials file and should be passed or set via explicit ENV variable [#26](https://github.com/getoutreach/conrad/pull/26)
+
 ## Version 2.3.0
 * Allow implicit credentials (such as `~/.aws/credentials`) to be used for the SQS Emitter [#23](https://github.com/getoutreach/conrad/pull/23)
 
