@@ -21,7 +21,6 @@ module Conrad
       # @return [String] the configured SQS queue URL
       attr_reader :queue_url
 
-      # @deprecated Will be removed in 3.0.0, no migration path
       # @return [String, nil] the configured region
       attr_reader :region
 
@@ -41,9 +40,11 @@ module Conrad
       # @param access_key_id [String] AWS Acesss Key ID
       # @param secret_access_key [String] AWS Secret Access Key
       #
-      # @raise [InvalidAwsCredentials] if any of region, access_key_id, or
-      #   secret_access_key are not provided AND the running environment does
-      #   not have valid AWS credentials
+      # @raise [InvalidAwsCredentials] if access_key_id or secret_access_key are
+      #   not provided AND the running environment does not have valid AWS
+      #   credentials
+      # @raise [Aws::Errors::MissingRegionError] if region is not provided and
+      #   also not set via an allowed AWS environment variable
       def initialize(queue_url:, region: nil, access_key_id: nil, secret_access_key: nil)
         @queue_url = queue_url
         @region = region
@@ -54,6 +55,8 @@ module Conrad
       end
 
       # Sends an event up to SQS
+      #
+      # @param event [String] the event to be sent as an SQS message body
       def call(event)
         client.send_message(queue_url: queue_url, message_body: event)
       end
@@ -61,16 +64,16 @@ module Conrad
       private
 
       def create_client(region:, access_key_id:, secret_access_key:)
-        if secret_access_key.nil? || access_key_id.nil? || region.nil?
+        if secret_access_key.nil? || access_key_id.nil?
           validate_implicit_credentials
 
-          @client = Aws::SQS::Client.new
+          @client = Aws::SQS::Client.new({ region: region }.compact)
         else
-          @client = Aws::SQS::Client.new(
+          @client = Aws::SQS::Client.new({
             region: region,
             access_key_id: access_key_id,
             secret_access_key: secret_access_key
-          )
+          }.compact)
         end
       end
 
