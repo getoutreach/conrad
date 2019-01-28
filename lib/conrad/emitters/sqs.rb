@@ -55,7 +55,7 @@ module Conrad
 
       # Sends an event up to SQS
       def call(event)
-        @client.send_message(queue_url: queue_url, message_body: event)
+        client.send_message(queue_url: queue_url, message_body: event)
       end
 
       private
