@@ -3,6 +3,7 @@ require 'conrad'
 
 require 'minitest/autorun'
 require 'minitest/pride'
+require 'minitest/stub_const'
 
 class ConradTestCase < Minitest::Test
   make_my_diffs_pretty!
