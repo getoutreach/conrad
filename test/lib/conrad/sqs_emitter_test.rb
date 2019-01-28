@@ -21,16 +21,6 @@ class SqsEmitterTest < Minitest::Test
     end
   end
 
-  def test_initialize_when_missing_region_uses_implicit_creds
-    initialization_mock_expectation do
-      Conrad::Emitters::Sqs.new(
-        queue_url: 'foobar.com',
-        access_key_id: 'fake',
-        secret_access_key: 'fake'
-      )
-    end
-  end
-
   def test_initialize_when_missing_access_key_id_uses_implicit_creds
     initialization_mock_expectation do
       Conrad::Emitters::Sqs.new(
