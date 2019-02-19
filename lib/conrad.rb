@@ -1,8 +1,12 @@
-Gem.find_files('conrad/processors/*.rb').each { |file| require file }
-Gem.find_files('conrad/formatters/*.rb').each { |file| require file }
-Gem.find_files('conrad/emitters/*.rb').each { |file| require file }
-Gem.find_files('conrad/*.rb').each { |file| require file }
+require "conrad/version"
 
 # :nodoc:
 module Conrad
+  autoload :Collector,      'conrad/collector'
+  autoload :Errors,         'conrad/errors'
+  autoload :Emitters,       'conrad/emitters'
+  autoload :Formatters,     'conrad/formatters'
+  autoload :Processors,     'conrad/processors'
+  autoload :ProcessorStack, 'conrad/processor_stack'
+  autoload :Recorder,       'conrad/recorder'
 end

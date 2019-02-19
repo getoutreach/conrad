@@ -8,7 +8,7 @@ module Conrad
     # is given, the given credentials will be used. Otherwise, the emitter will
     # attempt to use values configured in the running environment according to
     # the AWS SDK documentation (such as from ~/.aws/credentials).
-    class Sqs
+    class Sqs < Base
       # Error for responding with issues around SQS credential creation
       class InvalidAwsCredentials < ::Conrad::Error
         # :nodoc:
@@ -57,7 +57,7 @@ module Conrad
       # Sends an event up to SQS
       #
       # @param event [String] the event to be sent as an SQS message body
-      def call(event)
+      def emit(event)
         client.send_message(queue_url: queue_url, message_body: event)
       end
 

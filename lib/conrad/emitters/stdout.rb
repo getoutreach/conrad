@@ -1,9 +1,9 @@
 module Conrad
   module Emitters
     # Basic emitter for sending events to $stdout.
-    class Stdout
+    class Stdout < Base
       # Puts an event to $stdout.
-      def call(event)
+      def emit(event)
         puts event
       end
     end
