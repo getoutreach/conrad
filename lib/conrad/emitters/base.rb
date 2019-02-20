@@ -6,12 +6,12 @@ module Conrad
     class Base
       def initialize(args = {})
         setup(args)
-        background_delivery = args[:background_delivery]
-        start_background_processing if background_delivery
+        @background = args[:background]
+        background_process if @background
       end
 
       def call(event)
-        if background_delivery
+        if @background
           enqueue(event)
         else
           emit(event)
@@ -20,23 +20,23 @@ module Conrad
 
       private
 
-      def setup(args = {})
-        @args = args
-      end
+      def setup(*); end
 
       attr_accessor :queue
-      attr_accessor :background_delivery
+      attr_accessor :background
 
       def enqueue(event)
-        queue.push(event)
+        @queue.push(event)
       end
 
-      def start_background_processing
-        queue = Queue.new if background_delivery
+      def background_process
+        @queue = Queue.new
         Thread.new do
-          unless queue.empty?
-            event = queue.pop
-            emit(event)
+          loop do
+            unless @queue.empty?
+              event = @queue.pop
+              emit(event)
+            end
           end
         end
       end
