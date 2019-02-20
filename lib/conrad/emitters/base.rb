@@ -2,8 +2,9 @@ require 'conrad/errors'
 
 module Conrad
   module Emitters
+    # Base class for emitters
     class Base
-      def initialize(args={})
+      def initialize(args = {})
         setup(args)
         background_delivery = args[:background_delivery]
         start_background_processing if background_delivery
@@ -19,7 +20,8 @@ module Conrad
 
       private
 
-      def setup(args={})
+      def setup(args = {})
+        @args = args
       end
 
       attr_accessor :queue
@@ -31,7 +33,7 @@ module Conrad
 
       def start_background_processing
         queue = Queue.new if background_delivery
-        Thread.new do 
+        Thread.new do
           unless queue.empty?
             event = queue.pop
             emit(event)

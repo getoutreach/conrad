@@ -1,4 +1,4 @@
-require "conrad/version"
+require 'conrad/version'
 
 # :nodoc:
 module Conrad

@@ -1,4 +1,5 @@
 module Conrad
+  # :nodoc:
   module Processors
     autoload :AddTimestamp, 'conrad/processors/add_timestamp'
     autoload :AddUUID,      'conrad/processors/add_uuid'
