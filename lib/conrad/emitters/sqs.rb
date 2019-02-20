@@ -35,6 +35,15 @@ module Conrad
       # @return [Aws::SQS::Client] the created client
       attr_reader :client
 
+      # Sends an event up to SQS
+      #
+      # @param event [String] the event to be sent as an SQS message body
+      def emit(event)
+        client.send_message(queue_url: queue_url, message_body: event)
+      end
+
+      private
+
       # @param queue_url [String] the queue to send messages to
       # @param region [String] region the queue lives in
       # @param access_key_id [String] AWS Acesss Key ID
@@ -45,7 +54,7 @@ module Conrad
       #   credentials
       # @raise [Aws::Errors::MissingRegionError] if region is not provided and
       #   also not set via an allowed AWS environment variable
-      def initialize(queue_url:, region: nil, access_key_id: nil, secret_access_key: nil)
+      def setup(queue_url:, region: nil, access_key_id: nil, secret_access_key: nil)
         @queue_url = queue_url
         @region = region
         @access_key_id = access_key_id
@@ -53,15 +62,6 @@ module Conrad
 
         create_client(region: region, access_key_id: access_key_id, secret_access_key: secret_access_key)
       end
-
-      # Sends an event up to SQS
-      #
-      # @param event [String] the event to be sent as an SQS message body
-      def emit(event)
-        client.send_message(queue_url: queue_url, message_body: event)
-      end
-
-      private
 
       def create_client(region:, access_key_id:, secret_access_key:)
         if secret_access_key.nil? || access_key_id.nil?
