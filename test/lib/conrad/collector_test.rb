@@ -63,6 +63,23 @@ class CollectorTest < Minitest::Test
     end
   end
 
+  class SleepyEmitter
+    attr_reader :events
+
+    def initialize
+      @events = []
+    end
+
+    def call(event)
+      sleep 0.1
+      @events << event
+    end
+  end
+
+  def setup
+    Conrad.background_emit = false
+  end
+
   def teardown
     Conrad::Collector.instance_variable_set(:@default_emit_as_batch, nil)
     Conrad::Collector.instance_variable_set(:@default_processors, nil)
@@ -271,5 +288,34 @@ class CollectorTest < Minitest::Test
 
     assert_instance_of ArbitraryTestingError, logged_error[:error]
     assert_equal 'Arbitrary odd number', logged_error[:error].message
+  end
+
+  def test_background_emission
+    Conrad.background_emit = true
+
+    emitter = SleepyEmitter.new
+    collector = Conrad::Collector.new(emitter: emitter, logger: Logger.new(STDOUT), formatter: PASS_THROUGH)
+
+    assert_equal([], emitter.events)
+    collector.add_event(background: :event)
+    collector.record_events
+    assert_equal([], emitter.events)
+
+    sleep 1
+
+    assert_equal([{ background: :event }], emitter.events)
+  end
+
+  def test_multiple_emitters
+    emitter1  = CollectingEmitter.new
+    collector = Conrad::Collector.new(emitter: [emitter1, emitter1], formatter: PASS_THROUGH)
+
+    collector.add_event(one: :one)
+    collector.add_event(two: :two)
+
+    collector.record_events
+
+    assert_equal 4, emitter1.events.length
+    assert_equal [{ one: :one }, { two: :two }, { one: :one }, { two: :two }], emitter1.events
   end
 end
