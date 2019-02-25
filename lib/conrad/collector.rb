@@ -109,8 +109,6 @@ module Conrad
       @emitter = emitter
       @emit_as_batch = emit_as_batch
       @logger = logger
-      @queue  = Queue.new
-      loop_dequeue! if Conrad.background_emit?
     end
 
     # Adds an event to the Collector to be audited at a later time. The
@@ -140,10 +138,12 @@ module Conrad
     #   emitted events, the error will be allowed to bubble up. This is to
     #   prevent the unexpected loss of events if a single one is malformed.
     def record_events
-      if Conrad.background_emit?
-        @queue.push(events.clone)
-      else
-        emit(events)
+      Array(emitter).each do |emitter|
+        if emit_as_batch?
+          record_events_as_batch(emitter.clone, events.clone)
+        else
+          record_individual_events(emitter.clone, events.clone)
+        end
       end
     ensure
       reset_state
@@ -176,33 +176,19 @@ module Conrad
     end
 
     def record_events_as_batch(emitter, events)
-      emitter.call(events)
+      EmitterQueue.enqueue do
+        emitter.call(events)
+      end
     end
 
     def record_individual_events(emitter, events)
       events.each do |event|
         begin
-          emitter.call(event)
+          EmitterQueue.enqueue do
+            emitter.call(event)
+          end
         rescue StandardError => e
           write_log(:error, e)
-        end
-      end
-    end
-
-    def emit(events)
-      Array(emitter).each do |emitter|
-        if emit_as_batch?
-          record_events_as_batch(emitter, events)
-        else
-          record_individual_events(emitter, events)
-        end
-      end
-    end
-
-    def loop_dequeue!
-      Thread.new do
-        loop do
-          emit(@queue.pop) unless @queue.empty?
         end
       end
     end

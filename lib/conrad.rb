@@ -13,7 +13,12 @@ module Conrad
   class << self
     # Boolean indicating if the events collected should be emitted in the
     # backgournd. Defaults to false.
-    attr_accessor :background_emit
-    alias background_emit? background_emit
+    def background_emit?
+      EmitterQueue.instance.background
+    end
+
+    def background_emit=(value)
+      EmitterQueue.instance.background = value
+    end
   end
 end
