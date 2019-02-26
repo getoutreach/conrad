@@ -176,7 +176,7 @@ module Conrad
     end
 
     def record_events_as_batch(emitter, events)
-      EmitterQueue.enqueue do
+      EmitterQueue.instance.enqueue do
         emitter.call(events)
       end
     end
@@ -184,7 +184,7 @@ module Conrad
     def record_individual_events(emitter, events)
       events.each do |event|
         begin
-          EmitterQueue.enqueue do
+          EmitterQueue.instance.enqueue do
             emitter.call(event)
           end
         rescue StandardError => e

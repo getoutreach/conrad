@@ -4,6 +4,7 @@ require 'conrad/version'
 module Conrad
   autoload :Collector,      'conrad/collector'
   autoload :Errors,         'conrad/errors'
+  autoload :EmitterQueue,   'conrad/emitter_queue'
   autoload :Emitters,       'conrad/emitters'
   autoload :Formatters,     'conrad/formatters'
   autoload :Processors,     'conrad/processors'
@@ -12,7 +13,7 @@ module Conrad
 
   class << self
     # Boolean indicating if the events collected should be emitted in the
-    # backgournd. Defaults to false.
+    # background. Defaults to false.
     def background_emit?
       EmitterQueue.instance.background
     end

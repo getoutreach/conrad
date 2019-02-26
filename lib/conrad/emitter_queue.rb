@@ -6,14 +6,18 @@ module Conrad
     attr_accessor :logger
 
     def initialize
-      Thread.abort_on_exception = true
+      @thread = nil
       @queue = Queue.new
       @logger ||= Logger.new(STDOUT)
     end
 
-    def background=(value)
-      @background = value
-      start_thread if value
+    def background=(bg)
+      @background = bg
+      start_thread if bg
+      if end_thread?
+        @queue.push -> () { throw :debackground }
+        @thread.join
+      end
     end
 
     def enqueue
@@ -21,21 +25,20 @@ module Conrad
       
       # if it's backgounded we can break out of here, as the background
       #   queue will pick it up. otherwise, we need to explicitly process it
-      process! unless background
+      emit! unless @background
     end
 
     private
 
-    def process!
-      until @queue.empty? do
-        emit!
-      end
+    def end_thread?
+      @thread && !@background
     end
 
     def start_thread
       @thread ||= Thread.new do
-        loop do
-          unless @queue.empty?
+        Thread.current.abort_on_exception = true
+        catch :debackground do
+          loop do
             emit!
           end
         end
@@ -47,7 +50,9 @@ module Conrad
     end
 
     def emit!
-      @queue.pop.call()
+      until @queue.empty? do
+        @queue.pop.call()
+      end
     end
   end
 end
