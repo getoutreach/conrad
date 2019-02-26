@@ -140,9 +140,9 @@ module Conrad
     def record_events
       Array(emitter).each do |emitter|
         if emit_as_batch?
-          record_events_as_batch(emitter.clone, events.clone)
+          record_events_as_batch(emitter, events.clone)
         else
-          record_individual_events(emitter.clone, events.clone)
+          record_individual_events(emitter, events.clone)
         end
       end
     ensure
@@ -183,12 +183,12 @@ module Conrad
 
     def record_individual_events(emitter, events)
       events.each do |event|
-        begin
-          EmitterQueue.instance.enqueue do
+        EmitterQueue.instance.enqueue do
+          begin
             emitter.call(event)
+          rescue StandardError => e
+            write_log(:error, e)
           end
-        rescue StandardError => e
-          write_log(:error, e)
         end
       end
     end

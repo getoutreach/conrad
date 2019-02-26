@@ -14,10 +14,6 @@ module Conrad
     def background=(bg)
       @background = bg
       start_thread if bg
-      if end_thread?
-        @queue.push -> () { throw :debackground }
-        @thread.join
-      end
     end
 
     def enqueue
@@ -30,17 +26,12 @@ module Conrad
 
     private
 
-    def end_thread?
-      @thread && !@background
-    end
-
     def start_thread
       @thread ||= Thread.new do
         Thread.current.abort_on_exception = true
-        catch :debackground do
-          loop do
-            emit!
-          end
+        loop do
+          emit!
+          break unless Conrad::EmitterQueue.instance.background
         end
       end
     rescue e
