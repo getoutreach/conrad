@@ -40,7 +40,8 @@ module Conrad
           end
         end
       end
-    rescue
+    rescue e
+      logger.error(e)
       @thread = nil
       start_thread
     end
