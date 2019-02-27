@@ -1,8 +1,13 @@
 module Conrad
+  # Centralized event emission queue across threads
   class EmitterQueue
     include Singleton
 
+    # Boolean that determines whether events will be emitted inline or in a
+    #   background thread
     attr_reader :background
+
+    # Logger object used for sending log events
     attr_accessor :logger
 
     def initialize
@@ -11,11 +16,17 @@ module Conrad
       @logger ||= Logger.new(STDOUT)
     end
 
-    def background=(bg)
-      @background = bg
-      start_thread if bg
+    # bakground setter. Will start/stop the background thread
+    # @param value [Boolean] assigns whether events should be processed inline
+    #   or in a separate thread.
+    def background=(value)
+      @background = value
+      value ? start_thread : @thread&.join
     end
 
+    # Enqueues a block
+    # @yield block to execute. Will either run inline or separately depending on
+    #   whether the queue is backgrounded
     def enqueue
       @queue.push -> () { yield }
       
