@@ -21,15 +21,15 @@ module Conrad
     #   or in a separate thread.
     def background=(value)
       @background = value
-      value ? start_thread : @thread&.join
+      value ? start_thread : @thread && @thread.join
     end
 
     # Enqueues a block
     # @yield block to execute. Will either run inline or separately depending on
     #   whether the queue is backgrounded
     def enqueue
-      @queue.push -> () { yield }
-      
+      @queue.push -> { yield }
+
       # if it's backgounded we can break out of here, as the background
       #   queue will pick it up. otherwise, we need to explicitly process it
       emit! unless @background
@@ -52,9 +52,7 @@ module Conrad
     end
 
     def emit!
-      until @queue.empty? do
-        @queue.pop.call()
-      end
+      @queue.pop.call until @queue.empty?
     end
   end
 end
