@@ -21,7 +21,7 @@ module Conrad
     #   or in a separate thread.
     def background=(value)
       @background = value
-      value ? start_thread : @thread && @thread.join
+      value ? start_thread : @thread = nil
     end
 
     # Enqueues a block
