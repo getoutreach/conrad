@@ -49,7 +49,9 @@ module Conrad
         client.put_record(
           stream_name: stream_name,
           data: event,
-          partition_key: event.first(255) # There's a 256 character limit on the partition key, and it's hashed down into a value used to pick the shard to put the data on
+          # There's a 256 character limit on the partition key, and it's hashed down into a value used to
+          # pick the shard to put the data on
+          partition_key: event.first(255)
         )
       end
 
@@ -62,10 +64,10 @@ module Conrad
           @client = Aws::Kinesis::Client.new({ region: region }.compact)
         else
           @client = Aws::Kinesis::Client.new({
-                                           region: region,
-                                           access_key_id: access_key_id,
-                                           secret_access_key: secret_access_key
-                                         }.compact)
+            region: region,
+            access_key_id: access_key_id,
+            secret_access_key: secret_access_key
+          }.compact)
         end
       end
 

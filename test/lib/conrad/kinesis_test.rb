@@ -23,9 +23,9 @@ class KinesisEmitterTest < Minitest::Test
 
   def test_client_calls_put_record_on_call
     emitter = Conrad::Emitters::Kinesis.new(
-        stream_name: 'foobar',
-        region: 'whatever',
-        secret_access_key: 'fake'
+      stream_name: 'foobar',
+      region: 'whatever',
+      secret_access_key: 'fake'
     )
 
     data = { name: 'test_event' }
