@@ -42,7 +42,7 @@ module Conrad
         Thread.current.abort_on_exception = true
         loop do
           emit!
-          break unless Conrad::EmitterQueue.instance.background
+          break unless @background
         end
       end
     rescue e
