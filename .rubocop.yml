@@ -2,10 +2,12 @@ Metrics/LineLength:
   Max: 120
 
 Metrics/MethodLength:
+  Max: 15
   Exclude:
     - 'test/**/*'
 
 Metrics/ClassLength:
+  Max: 150
   Exclude:
     - 'test/**/*'
 

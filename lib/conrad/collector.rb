@@ -138,10 +138,12 @@ module Conrad
     #   emitted events, the error will be allowed to bubble up. This is to
     #   prevent the unexpected loss of events if a single one is malformed.
     def record_events
-      if emit_as_batch?
-        record_events_as_batch
-      else
-        record_individual_events
+      Array(emitter).each do |emitter|
+        if emit_as_batch?
+          record_events_as_batch(emitter, events.clone)
+        else
+          record_individual_events(emitter, events.clone)
+        end
       end
     ensure
       reset_state
@@ -173,16 +175,20 @@ module Conrad
       end
     end
 
-    def record_events_as_batch
-      emitter.call(events)
+    def record_events_as_batch(emitter, events)
+      EmitterQueue.instance.enqueue do
+        emitter.call(events)
+      end
     end
 
-    def record_individual_events
+    def record_individual_events(emitter, events)
       events.each do |event|
-        begin
-          emitter.call(event)
-        rescue StandardError => e
-          write_log(:error, e)
+        EmitterQueue.instance.enqueue do
+          begin
+            emitter.call(event)
+          rescue StandardError => e
+            write_log(:error, e)
+          end
         end
       end
     end
