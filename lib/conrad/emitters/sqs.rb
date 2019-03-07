@@ -19,10 +19,10 @@ module Conrad
         client.send_message(queue_url: queue_url, message_body: event)
       end
 
-      private
-
-      def self.client_class
-        Aws::SQS::Client
+      class << self
+        def client_class
+          Aws::SQS::Client
+        end
       end
     end
   end

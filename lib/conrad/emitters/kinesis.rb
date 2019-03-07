@@ -24,10 +24,10 @@ module Conrad
         )
       end
 
-      private
-
-      def self.client_class
-        Aws::Kinesis::Client
+      class << self
+        def client_class
+          Aws::Kinesis::Client
+        end
       end
     end
   end
