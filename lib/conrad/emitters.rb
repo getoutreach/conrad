@@ -3,7 +3,9 @@
 module Conrad
   # :nodoc:
   module Emitters
-    autoload :Sqs,    'conrad/emitters/sqs'
-    autoload :Stdout, 'conrad/emitters/stdout'
+    autoload :AmazonBase, 'conrad/emitters/amazon_base'
+    autoload :Kinesis,    'conrad/emitters/kinesis'
+    autoload :Sqs,        'conrad/emitters/sqs'
+    autoload :Stdout,     'conrad/emitters/stdout'
   end
 end

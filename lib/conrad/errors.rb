@@ -9,6 +9,15 @@ module Conrad
     end
   end
 
+  # Error for responding with issues around kinesis credential creation
+  class InvalidAwsCredentials < Error
+    # :nodoc:
+    def to_s
+      'Must provide secret_access_key and access_key_id OR rely ' \
+      'on configured values in the running environment.'
+    end
+  end
+
   # Error raised when the value of an event attribute is not of one of the
   # allowed types
   class ForbiddenValue < Error

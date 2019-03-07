@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'aws-sdk'
 
-class SqsEmitterTest < Minitest::Test
+class KinesisEmitterTest < Minitest::Test
   class MockAwsCredentialResolver
     def initialize(resolve_as)
       @resolve_as = resolve_as
@@ -21,10 +21,31 @@ class SqsEmitterTest < Minitest::Test
     end
   end
 
+  def test_client_calls_put_record_on_call
+    initialization_mock_expectation do
+      emitter = Conrad::Emitters::Kinesis.new(
+        stream_name: 'foobar',
+        region: 'whatever',
+        secret_access_key: 'fake'
+      )
+
+      data = { name: 'test_event' }
+
+      mock = Minitest::Mock.new
+      mock.expect :put_record, true, [Hash]
+
+      emitter.stub :client, mock do
+        assert emitter.call(data)
+      end
+
+      assert_mock mock
+    end
+  end
+
   def test_initialize_when_missing_access_key_id_uses_implicit_creds
     initialization_mock_expectation do
-      Conrad::Emitters::Sqs.new(
-        queue_url: 'foobar.com',
+      Conrad::Emitters::Kinesis.new(
+        stream_name: 'foobar',
         region: 'whatever',
         secret_access_key: 'fake'
       )
@@ -33,8 +54,8 @@ class SqsEmitterTest < Minitest::Test
 
   def test_initialize_when_missing_secret_access_key_uses_implicit_creds
     initialization_mock_expectation do
-      Conrad::Emitters::Sqs.new(
-        queue_url: 'foobar.com',
+      Conrad::Emitters::Kinesis.new(
+        stream_name: 'foobar',
         region: 'whatever',
         access_key_id: 'fake'
       )
@@ -48,7 +69,7 @@ class SqsEmitterTest < Minitest::Test
       resolver.mock_resolution_expectation
 
       assert_raises(Conrad::InvalidAwsCredentials) do
-        Conrad::Emitters::Sqs.new(queue_url: 'foobar.com')
+        Conrad::Emitters::Kinesis.new(stream_name: 'foobar')
       end
 
       resolver.verify_mock
@@ -64,8 +85,8 @@ class SqsEmitterTest < Minitest::Test
 
     built_emitter = nil
 
-    Aws::SQS.stub_const(:Client, aws_client_mock) do
-      built_emitter = Conrad::Emitters::Sqs.new(queue_url: 'foobar.com', **access_args)
+    Aws::Kinesis.stub_const(:Client, aws_client_mock) do
+      built_emitter = Conrad::Emitters::Kinesis.new(stream_name: 'foobar', **access_args)
     end
 
     aws_client_mock.verify
@@ -80,7 +101,7 @@ class SqsEmitterTest < Minitest::Test
     aws_client_mock = Minitest::Mock.new
 
     ::Aws::CredentialProviderChain.stub :new, resolver do
-      ::Aws::SQS::Client.stub :new, aws_client_mock do
+      ::Aws::Kinesis::Client.stub :new, aws_client_mock do
         resolver.mock_resolution_expectation
 
         yield

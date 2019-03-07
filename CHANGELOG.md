@@ -3,6 +3,7 @@
 ## Unreleased
 * Adding support for multiple emitters per collector [#28](https://github.com/getoutreach/conrad/pull/28)
 * Adding the ability to emit events in a background thread [#28](https://github.com/getoutreach/conrad/pull/28)
+* Adding a Kinesis Emitter [#30](https://github.com/getoutreach/conrad/pull/30)
 
 ## Version 2.3.1
 * Bug fix: `region` is not stored in a credentials file and should be passed or set via explicit ENV variable [#26](https://github.com/getoutreach/conrad/pull/26)
