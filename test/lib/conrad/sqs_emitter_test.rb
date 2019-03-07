@@ -47,7 +47,7 @@ class SqsEmitterTest < Minitest::Test
     ::Aws::CredentialProviderChain.stub :new, resolver do
       resolver.mock_resolution_expectation
 
-      assert_raises(Conrad::Emitters::Sqs::InvalidAwsCredentials) do
+      assert_raises(Conrad::InvalidAwsCredentials) do
         Conrad::Emitters::Sqs.new(queue_url: 'foobar.com')
       end
 

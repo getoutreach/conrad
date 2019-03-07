@@ -66,7 +66,7 @@ class KinesisEmitterTest < Minitest::Test
     ::Aws::CredentialProviderChain.stub :new, resolver do
       resolver.mock_resolution_expectation
 
-      assert_raises(Conrad::Emitters::Kinesis::InvalidAwsCredentials) do
+      assert_raises(Conrad::InvalidAwsCredentials) do
         Conrad::Emitters::Kinesis.new(stream_name: 'foobar')
       end
 
