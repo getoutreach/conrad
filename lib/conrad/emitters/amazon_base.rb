@@ -52,7 +52,7 @@ module Conrad
       end
 
       def validate_implicit_credentials
-        raise Conrad::InvalidAwsCredentials unless Aws::CredentialProviderChain.new.resolve.set?
+        raise Conrad::InvalidAwsCredentials unless Aws::CredentialProviderChain.new.resolve&.set?
       end
     end
   end
