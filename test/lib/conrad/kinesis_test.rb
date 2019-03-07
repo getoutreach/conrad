@@ -22,22 +22,24 @@ class KinesisEmitterTest < Minitest::Test
   end
 
   def test_client_calls_put_record_on_call
-    emitter = Conrad::Emitters::Kinesis.new(
-      stream_name: 'foobar',
-      region: 'whatever',
-      secret_access_key: 'fake'
-    )
+    initialization_mock_expectation do
+      emitter = Conrad::Emitters::Kinesis.new(
+        stream_name: 'foobar',
+        region: 'whatever',
+        secret_access_key: 'fake'
+      )
 
-    data = { name: 'test_event' }
+      data = { name: 'test_event' }
 
-    mock = Minitest::Mock.new
-    mock.expect :put_record, true, [Hash]
+      mock = Minitest::Mock.new
+      mock.expect :put_record, true, [Hash]
 
-    emitter.stub :client, mock do
-      assert emitter.call(data)
+      emitter.stub :client, mock do
+        assert emitter.call(data)
+      end
+
+      assert_mock mock
     end
-
-    assert_mock mock
   end
 
   def test_initialize_when_missing_access_key_id_uses_implicit_creds
