@@ -1,4 +1,5 @@
 require 'active_model'
+require 'aws-sdk'
 
 module Conrad
   module Emitters
