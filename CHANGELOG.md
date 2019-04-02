@@ -1,6 +1,9 @@
 # Conrad Changelog
 
 ## Unreleased
+* Adding default `require 'aws-sdk'` to AWS emitters. [#33](https://github.com/getoutreach/conrad/pull/33)
+
+## Version 2.5.0
 * Adding support for multiple emitters per collector [#28](https://github.com/getoutreach/conrad/pull/28)
 
 ## Version 2.4.0
