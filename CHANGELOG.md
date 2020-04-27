@@ -1,12 +1,13 @@
 # Conrad Changelog
 
 ## Unreleased
+* Require AWS SDK v3. [#34](https://github.com/getoutreach/conrad/pull/34)
+
+## Version 2.4.1
 * Adding default `require 'aws-sdk'` to AWS emitters. [#33](https://github.com/getoutreach/conrad/pull/33)
 
-## Version 2.5.0
-* Adding support for multiple emitters per collector [#28](https://github.com/getoutreach/conrad/pull/28)
-
 ## Version 2.4.0
+* Adding support for multiple emitters per collector [#28](https://github.com/getoutreach/conrad/pull/28)
 * Adding the ability to emit events in a background thread [#28](https://github.com/getoutreach/conrad/pull/28)
 * Adding a Kinesis Emitter [#30](https://github.com/getoutreach/conrad/pull/30)
 

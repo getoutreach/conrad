@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'aws-sdk'
+require 'aws-sdk-sqs'
 
 class SqsEmitterTest < Minitest::Test
   class MockAwsCredentialResolver
