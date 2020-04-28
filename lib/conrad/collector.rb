@@ -49,17 +49,17 @@ module Conrad
 
       # @return the configured formatter. Defaults to Conrad::Formatters::Json
       def default_formatter
-        @default_formatter || Conrad::Formatters::JSON.new
+        @default_formatter ||= Conrad::Formatters::JSON.new
       end
 
       # @return the configured emitter. Defaults to Conrad::Emitters::Stdout
       def default_emitter
-        @default_emitter || Conrad::Emitters::Stdout.new
+        @default_emitter ||= Conrad::Emitters::Stdout.new
       end
 
       # @return [Array<#call>]
       def default_processors
-        @default_processors || []
+        @default_processors ||= []
       end
     end
 

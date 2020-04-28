@@ -2,6 +2,7 @@
 
 ## Unreleased
 * Require AWS SDK v3. [#34](https://github.com/getoutreach/conrad/pull/34)
+* Fix `warning: instance variable @default_X not initialized`. [#34](https://github.com/getoutreach/conrad/pull/34)
 
 ## Version 2.4.1
 * Adding default `require 'aws-sdk'` to AWS emitters. [#33](https://github.com/getoutreach/conrad/pull/33)
