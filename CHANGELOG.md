@@ -1,6 +1,8 @@
 # Conrad Changelog
 
 ## Unreleased
+
+## Version 3.0.0
 * Require AWS SDK v3. [#34](https://github.com/getoutreach/conrad/pull/34)
 * Fix `warning: instance variable @default_X not initialized`. [#34](https://github.com/getoutreach/conrad/pull/34)
 
