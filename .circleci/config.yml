@@ -28,9 +28,39 @@ jobs:
       - run:
           name: Run Tests
           command: bundle exec rake test
+  ruby2.6:
+    docker:
+      - image: circleci/ruby:2.6
+    steps:
+      - checkout
+      - run:
+          name: Bundle install
+          command: bundle install
+      - run:
+          name: Rubocop
+          command: bundle exec rubocop --fail-level autocorrect
+      - run:
+          name: Run Tests
+          command: bundle exec rake test
+  ruby2.7:
+    docker:
+      - image: circleci/ruby:2.7
+    steps:
+      - checkout
+      - run:
+          name: Bundle install
+          command: bundle install
+      - run:
+          name: Rubocop
+          command: bundle exec rubocop --fail-level autocorrect
+      - run:
+          name: Run Tests
+          command: bundle exec rake test
 workflows:
   version: 2
   build:
     jobs:
       - ruby2.4
       - ruby2.5
+      - ruby2.6
+      - ruby2.7
