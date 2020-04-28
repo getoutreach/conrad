@@ -20,10 +20,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activemodel'
-  spec.add_dependency 'aws-sdk'
+  spec.add_dependency 'aws-sdk-kinesis'
+  spec.add_dependency 'aws-sdk-sqs'
 
   spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'minitest-stub-const'
-  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rake', '>= 13.0'
   spec.add_development_dependency 'rubocop', '~> 0.60.0'
 end

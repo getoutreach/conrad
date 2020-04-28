@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'aws-sdk'
+require 'aws-sdk-kinesis'
 
 class KinesisEmitterTest < Minitest::Test
   class MockAwsCredentialResolver
