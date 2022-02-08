@@ -2,7 +2,7 @@ version: 2
 jobs:
   ruby2.4:
     docker:
-      - image: circleci/ruby:2.4
+      - image: cimg/ruby:2.4
     steps:
       - checkout
       - run:
@@ -16,7 +16,7 @@ jobs:
           command: bundle exec rake test
   ruby2.5:
     docker:
-      - image: circleci/ruby:2.5
+      - image: cimg/ruby:2.5
     steps:
       - checkout
       - run:
@@ -30,7 +30,7 @@ jobs:
           command: bundle exec rake test
   ruby2.6:
     docker:
-      - image: circleci/ruby:2.6
+      - image: cimg/ruby:2.6
     steps:
       - checkout
       - run:
@@ -44,7 +44,7 @@ jobs:
           command: bundle exec rake test
   ruby2.7:
     docker:
-      - image: circleci/ruby:2.7
+      - image: cimg/ruby:2.7
     steps:
       - checkout
       - run:
