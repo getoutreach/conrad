@@ -1,35 +1,5 @@
 version: 2
 jobs:
-  ruby2.4:
-    docker:
-      - image: cimg/ruby:2.4
-    steps:
-      - add_ssh_keys
-      - checkout
-      - run:
-          name: Bundle install
-          command: bundle install
-      - run:
-          name: Rubocop
-          command: bundle exec rubocop --fail-level autocorrect
-      - run:
-          name: Run Tests
-          command: bundle exec rake test
-  ruby2.5:
-    docker:
-      - image: cimg/ruby:2.5
-    steps:
-      - add_ssh_keys
-      - checkout
-      - run:
-          name: Bundle install
-          command: bundle install
-      - run:
-          name: Rubocop
-          command: bundle exec rubocop --fail-level autocorrect
-      - run:
-          name: Run Tests
-          command: bundle exec rake test
   ruby2.6:
     docker:
       - image: cimg/ruby:2.6
@@ -64,10 +34,6 @@ workflows:
   version: 2
   build:
     jobs:
-      - ruby2.4:
-          context: docker-registry
-      - ruby2.5:
-          context: docker-registry
       - ruby2.6:
           context: docker-registry
       - ruby2.7:
