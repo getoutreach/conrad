@@ -4,6 +4,7 @@ jobs:
     docker:
       - image: cimg/ruby:2.4
     steps:
+      - add_ssh_keys
       - checkout
       - run:
           name: Bundle install
@@ -18,6 +19,7 @@ jobs:
     docker:
       - image: cimg/ruby:2.5
     steps:
+      - add_ssh_keys
       - checkout
       - run:
           name: Bundle install
@@ -32,6 +34,7 @@ jobs:
     docker:
       - image: cimg/ruby:2.6
     steps:
+      - add_ssh_keys
       - checkout
       - run:
           name: Bundle install
@@ -46,6 +49,7 @@ jobs:
     docker:
       - image: cimg/ruby:2.7
     steps:
+      - add_ssh_keys
       - checkout
       - run:
           name: Bundle install
@@ -60,7 +64,11 @@ workflows:
   version: 2
   build:
     jobs:
-      - ruby2.4
-      - ruby2.5
-      - ruby2.6
-      - ruby2.7
+      - ruby2.4:
+          context: docker-registry
+      - ruby2.5:
+          context: docker-registry
+      - ruby2.6:
+          context: docker-registry
+      - ruby2.7:
+          context: docker-registry
